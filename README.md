@@ -1,4 +1,4 @@
-# Asynchronous Boosting Tree (ABTree)
+# Distributed Asynchronous Boosting Tree (DAB Tree)
 Team: Qin Lyu, Bingfeng Xia, MingLong Wu, Hengte Lin
 
 ## Motivation:
