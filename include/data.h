@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <memory>
 
 enum FeaType {
   CONT = 0,
@@ -13,8 +14,11 @@ union Value {
   int n; //type 2, rank feature
 };
 
+typedef std::vector<Value> Sample;
+typedef std::shared_ptr<Sample> SamplePtr;
+
 struct DabData {
   std::vector<FeaType> types;
-  std::vector<std::vector<Value>> values;
+  std::vector<Sample> values;
 };
 

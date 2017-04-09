@@ -8,7 +8,8 @@ include_directories(dabtree ${PROJECT_SOURCE_DIR}/include)
 
 file(GLOB SOURCES
     src/*.cc
-    core/*.cc
+    src/core/*.cc
+    include/*.h
 )
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
