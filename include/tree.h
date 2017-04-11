@@ -7,8 +7,8 @@ using namespace std;
 const size_t MAX_NODE_SIZE = 64;
 
 struct RegTree {
-  size_t id;
-  vector<size_t> split_id;
+  int id;
+  vector<int> split_id;
   vector<Value> split_value;
 };
 

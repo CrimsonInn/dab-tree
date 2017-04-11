@@ -24,13 +24,13 @@ MessageTree::MessageTree(RegTree &t){
 }
 
 RegTree & MessageTree::ToRegTree(void){
-	auto reg_tree= new RegTree{
+	auto *reg_tree= new RegTree{
 		id, 
 		new vector<int>(split_id, split_id + sizeof split_id / sizeof split_id[0]),
 		new vector<Value>(split_value, split_value + sizeof split_value / sizeof split_value[0])
 	};
 
-	return reg_tree;
+	return *reg_tree;
 }
 
 
@@ -44,8 +44,8 @@ DLLEXPORT int run(){
     return 1;
 }
 
-void Master(int round, int comm_sz);
-void Worker(int round, int myrank, int comm_sz);
+void Master(int round, int comm_sz, MPI_Datatype &MPI_TREE);
+void Worker(int round, int myrank, int comm_sz, MPI_Datatype &MPI_TREE);
 
 DLLEXPORT int Dabtree(int round){
 	int myrank, comm_sz;
@@ -61,16 +61,16 @@ DLLEXPORT int Dabtree(int round){
 	MPI_Aint disps[3];
 	disps[0]=0;
 	disps[1]=int(&(m.split_id[0])-(int*)&m)*sizeof(int);
-	disps[2]=int(&(m.split_value[0])-(int*)&m)*sizeof(int);
-	MPI_Datatype MPI_TREE
+	disps[2]=int(&(m.split_value[0])-(Value*)&m)*sizeof(int);
+	MPI_Datatype MPI_TREE;
 	MPI_Type_create_struct(3,bls,disps,types,&MPI_TREE);
 	MPI_Type_commit(&MPI_TREE);
 	cout << "start working"<< "\n";
 	if (myrank==0){
-		Master(round,comm_sz);
+		Master(round,comm_sz, MPI_TREE);
 	}
 	else{
-		Worker(round,myrank,comm_sz);
+		Worker(round,myrank,comm_sz, MPI_TREE);
 	}
 
     cout << "success \n";
@@ -81,7 +81,7 @@ DLLEXPORT int Dabtree(int round){
 }
 
 
-void Master(int round, int comm_sz){
+void Master(int round, int comm_sz, MPI_Datatype &MPI_TREE){
 	int total_tree = round*(comm_sz-1);
 	int current_count=0;
 	MPI_Status stat;
@@ -97,7 +97,7 @@ void Master(int round, int comm_sz){
 		cout << "master receive tree from " << target_rank << "\n";
 		current_count += 1;
 		new_tree->id = current_count;
-		trees.push_back(&new_tree);
+		trees.push_back(*new_tree);
 
 		int send_count = current_count - remote_count;
 		//send tree count here
@@ -105,33 +105,34 @@ void Master(int round, int comm_sz){
 
 		//for loop to send trees
 		for(int i= remote_count+1; i<current_count+1; i++){
-			MPI_Send(&(tree[i]), 1, MPI_TREE, target_rank, 0, MPI_COMM_WORLD);
+			MPI_Send(&(trees[i]), 1, MPI_TREE, target_rank, 0, MPI_COMM_WORLD);
 		}
 		
 	}
 
 }
 
-void Worker(int round, int myrank, int comm_sz){
+void Worker(int round, int myrank, int comm_sz, MPI_Datatype &MPI_TREE){
 	int local_count=0;
-	VecTree vec_tree
+	MPI_Status stat;
+	VecTree vec_tree;
 	for (int i=0; i<round;i++){
 		//call train local here
 		RegTree *tree = new RegTree;//TrainLocal();
-		MessageTree *message_tree = new MessageTree(&tree);
+		MessageTree message_tree(*tree);
 		cout << "worker send tree"<< "\n";
-		message_tree->id=local_count;
-		MPI_Send(message_tree, 1, MPI_TREE, 0, 0, MPI_COMM_WORLD);
+		message_tree.id=local_count;
+		MPI_Send(&message_tree, 1, MPI_TREE, 0, 0, MPI_COMM_WORLD);
 
 		int receive_count; 
-		MPI_Recv(&receive_count, 1, MPI_INT, 0,0,MPI_COMM_WORLD);
+		MPI_Recv(&receive_count, 1, MPI_INT, 0,0,MPI_COMM_WORLD, &stat);
 		cout << "worker receive count"<< "\n";
 		for (int i=local_count; i < local_count+receive_count; i++){
-			MPI_Recv(message_tree, 1, MPI_TREE, 0,0,MPI_COMM_WORLD);
+			MPI_Recv(&message_tree, 1, MPI_TREE, 0,0,MPI_COMM_WORLD, &stat);
 			cout << "worker receive tree"<< "\n";
-			vec_tree.push_back(message_tree->ToRegTree());
+			vec_tree.push_back(message_tree.ToRegTree());
 		}
-		local_count=message_tree->id;
+		local_count=message_tree.id;
 	}
 }
 
