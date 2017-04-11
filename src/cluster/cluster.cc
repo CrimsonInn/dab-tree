@@ -12,7 +12,7 @@ struct MessageTree{
 	int id;
   	int split_id[MAX_NODE_SIZE];
   	Value split_value[MAX_NODE_SIZE];
-  	MessageTree();
+  	MessageTree()=default;
   	MessageTree( RegTree &t);
   	RegTree &ToRegTree();
 };
@@ -24,10 +24,12 @@ MessageTree::MessageTree(RegTree &t){
 }
 
 RegTree & MessageTree::ToRegTree(void){
-	auto *reg_tree= new RegTree{
+	RegTree *reg_tree= new RegTree{
 		id, 
-		new vector<int>(split_id, split_id + sizeof split_id / sizeof split_id[0]),
-		new vector<Value>(split_value, split_value + sizeof split_value / sizeof split_value[0])
+		*(new vector<int>( begin(split_id), end(split_id))),
+		//new vector<int>(split_id, split_id + sizeof split_id / sizeof split_id[0]),
+		//new vector<Value>(split_value, split_value + sizeof split_value / sizeof split_value[0])
+		*(new vector<Value>( begin(split_value), end(split_value)))
 	};
 
 	return *reg_tree;
@@ -88,7 +90,7 @@ void Master(int round, int comm_sz, MPI_Datatype &MPI_TREE){
 	//local tree
 	vector<MessageTree> trees;
 	while (current_count<=total_tree){
-		MessageTree *new_tree= new MessageTree();
+		MessageTree *new_tree= new MessageTree;
 
 		MPI_Recv(new_tree, 1, MPI_TREE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
 
