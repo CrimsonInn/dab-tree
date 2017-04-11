@@ -2,6 +2,7 @@
 #include <iostream>
 #include "mpi.h"
 #include "tree.h"
+#include <cstring>
 
 #define DLLEXPORT extern "C"
 using namespace std;
@@ -18,8 +19,8 @@ struct MessageTree{
 
 MessageTree::MessageTree(RegTree &t){
 	id = t.id;
-	memcopy(split_id, & t.split_id[0], t.split_id.size() * sizeof(t.split_id[0]));
-	memcopy(split_value, & t.split_value[0], t.split_value.size() * sizeof(t.split_value[0]));
+	memcpy(split_id, & t.split_id[0], t.split_id.size() * sizeof(t.split_id[0]));
+	memcpy(split_value, & t.split_value[0], t.split_value.size() * sizeof(t.split_value[0]));
 }
 
 RegTree & MessageTree::ToRegTree(void){
@@ -52,12 +53,13 @@ void Master(int round, int comm_sz){
 	//local tree
 	vector<MessageTree> trees;
 	while (current_count<=total_tree){
-		MessageTree *new_tree= new MessageTree();
+		MessageTree *new_tree= new MessageTree;
+
 		MPI_Recv(&new_tree, 1, MPI_TREE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
 
 		int remote_count = new_tree.id;
 		int target_rank = stat.MPI_SOURCE;
-		
+		cout << "master receive tree from " << target_rank << "\n";
 		current_count += 1;
 		new_tree.id = current_count;
 		tree.appendTree(new_tree);
@@ -80,17 +82,18 @@ void Worker(int round, int myrank, int comm_sz){
 	VecTree vec_tree
 	for (int i=0; i<round;i++){
 		//call train local here
-		ReGTree tree = TrainLocal();
+		RegTree tree = new RegTree;//TrainLocal();
 		MessageTree message_tree = MessageTree(tree);
-
+		cout << "worker send tree"<< "\n";
 		message_tree.id=local_count;
 		MPI_Send(&new_tree, 1, MPI_TREE, 0, 0, MPI_COMM_WORLD);
 
 		int receive_count; 
 		MPI_Recv(&receive_count, 1, MPI_INT, 0,0,MPI_COMM_WORLD);
-
+		cout << "worker receive count"<< "\n";
 		for (int i=local_count; i < local_count+receive_count; i++){
 			MPI_Recv(&message_tree, 1, MPI_TREE, 0,0,MPI_COMM_WORLD);
+			cout << "worker receive tree"<< "\n";
 			vec_tree.push_back(message_tree.ToRegTree());
 		}
 		local_count=message_tree.id;
@@ -100,7 +103,7 @@ void Worker(int round, int myrank, int comm_sz){
 
 DLLEXPORT int Dabtree(int round){
 	int myrank, comm_sz;
-
+	cout << "start project"<< "\n";
 	MPI_Init(NULL,NULL);
 	MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
@@ -116,7 +119,7 @@ DLLEXPORT int Dabtree(int round){
 	MPI_Datatype MPI_TREE
 	MPI_Type_create_struct(3,bls,disps,types,&MPI_TREE);
 	MPI_Type_commit(&MPI_TREE);
-
+	cout << "start working"<< "\n";
 	if (myrank==0){
 		Master(round,comm_sz);
 	}

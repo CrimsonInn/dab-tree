@@ -3,10 +3,10 @@
 
 #include <vector>
 #include "data.h"
-
+using namespace std;
 const size_t MAX_NODE_SIZE = 64;
 
-struct ReGTree {
+struct RegTree {
   size_t id;
   vector<size_t> split_id;
   vector<Value> split_value;
