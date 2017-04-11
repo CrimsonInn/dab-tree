@@ -41,7 +41,7 @@ include_directories("${source_dir}/googletest/include"
                     "${source_dir}/googlemock/include")
 
 
-SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -stdlib=libc++ -pthread -g -Wall")
+SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -pthread -g -Wall")
 find_package (Threads)
 find_package(Protobuf REQUIRED)
 
