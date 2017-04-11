@@ -10,7 +10,7 @@ enum FeaType {
 
 union Value {
   float v; //type 0, continuous feature
-  size_t id; // type 1, discrete feature
+  size_t cls; // type 1, discrete feature
   int n; //type 2, rank feature
 };
 
