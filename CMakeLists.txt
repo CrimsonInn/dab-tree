@@ -54,12 +54,16 @@ SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -pthread -g -Wall")
 find_package (Threads)
 find_package(Protobuf REQUIRED)
 
+
 include_directories(dabtree ${PROJECT_SOURCE_DIR}/include)
+include_directories(dabtree ${PROJECT_SOURCE_DIR}/data)
+
 
 file(GLOB SOURCES
     src/*.cc
     src/core/*.cc
     include/*.h
+    data/*.proto
 )
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
@@ -68,6 +72,9 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} libglog)
-add_library (dabcore STATIC src/core/data.cc src/core/tree.cc)
+target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARY})
+
+add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/protobuf/read_proto.cc)
 
 ADD_SUBDIRECTORY(tests)
+ADD_SUBDIRECTORY(data)
