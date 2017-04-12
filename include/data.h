@@ -1,3 +1,6 @@
+#ifndef DABTREE_DATA_H_
+#define DABTREE_DATA_H_
+
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -14,11 +17,12 @@ union Value {
   int n; //type 2, rank feature
 };
 
-typedef std::vector<Value> Sample;
-typedef std::shared_ptr<Sample> SamplePtr;
-
-struct DabData {
-  std::vector<FeaType> types;
-  std::vector<Sample> values;
+struct Batch {
+  std::vector<FeaType> fea_types;
+  std::vector<std::vector<Value>> samples;
 };
 
+typedef std::shared_ptr<Batch> BatchPtr;
+
+
+#endif  // DABTREE_DATA_H_
