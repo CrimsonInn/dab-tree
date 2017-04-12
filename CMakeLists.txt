@@ -34,6 +34,7 @@ ExternalProject_Add(
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/glog
     # Disable install step
     INSTALL_COMMAND ""
+    CMAKE_ARGS "-DWITH_GFLAGS=OFF"
 )
 ExternalProject_Get_Property(glog source_dir binary_dir)
 add_library(libglog IMPORTED STATIC GLOBAL)
@@ -43,11 +44,10 @@ set_target_properties(libglog PROPERTIES
     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
 )
 
-include_directories("${source_dir}/googletest/include"
-                    "${source_dir}/googlemock/include"
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/gtest/src/gtest/googletest/include"
+                    "${CMAKE_CURRENT_BINARY_DIR}/gtest/src/gtest/googlemock/include"
                     "${CMAKE_CURRENT_BINARY_DIR}/glog/src/glog-build/"
                     "${CMAKE_CURRENT_BINARY_DIR}/glog/src/glog/src/"
-#                    "${source_DIR}/gflag/include"
                     )
 
 SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -pthread -g -Wall")
