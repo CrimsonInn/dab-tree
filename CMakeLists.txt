@@ -74,7 +74,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} libglog)
 target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARY})
 
-add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/protobuf/read_proto.cc)
+add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/protobuf/read_proto.cc src/protobuf/write_proto.cc)
 
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
