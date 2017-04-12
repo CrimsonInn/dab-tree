@@ -19,7 +19,7 @@ union Value {
 
 struct Batch {
   std::vector<FeaType> fea_types;
-  std::vector<std::vector<Value>> samples;
+  std::vector<std::vector<Value> > samples;
 };
 
 typedef std::shared_ptr<Batch> BatchPtr;
