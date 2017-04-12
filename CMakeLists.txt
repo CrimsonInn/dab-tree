@@ -66,7 +66,7 @@ if(MPI_FOUND)
 	add_executable(cluster src/cluster/cluster.cc)
 	target_link_libraries(cluster ${MPI_LIBRARIES})
 endif()
-=======
+
 ADD_SUBDIRECTORY(tests)
 
 #file(GLOB TEST_SRC_FILES tests/*.cc)

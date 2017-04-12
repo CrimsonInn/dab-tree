@@ -10,29 +10,32 @@ using namespace std;
 
 struct MessageTree{
 	int id;
-  	int split_id[MAX_NODE_SIZE];
+  	int split_fea[MAX_NODE_SIZE];
   	Value split_value[MAX_NODE_SIZE];
   	MessageTree()=default;
   	MessageTree( RegTree &t);
   	RegTree &ToRegTree();
 };
 
-MessageTree::MessageTree(RegTree &t){
-	id = t.id;
-	memcpy(split_id, & t.split_id[0], t.split_id.size() * sizeof(t.split_id[0]));
-	memcpy(split_value, & t.split_value[0], t.split_value.size() * sizeof(t.split_value[0]));
+typedef std::shared_ptr<MessageTree> MessageTreePtr;
+typedef std::shared_ptr<vector<MessageTreePtr>> EnsembleMessageTreePtr;
+
+MessageTree::MessageTree(RegTreePtr t){
+	id = t->id;
+	memcpy(split_fea, & t->split_fea[0], t->split_fea.size() * sizeof(t->split_fea[0]));
+	memcpy(split_value, & t->split_value[0], t->split_value.size() * sizeof(t->split_value[0]));
 }
 
-RegTree & MessageTree::ToRegTree(void){
-	RegTree *reg_tree= new RegTree{
+RegTreePtr MessageTree::ToRegTree(void){
+	RegTreePtr reg_tree ( new RegTree{
 		id, 
-		*(new vector<int>( begin(split_id), end(split_id))),
-		//new vector<int>(split_id, split_id + sizeof split_id / sizeof split_id[0]),
+		*(new vector<int>( begin(split_fea), end(split_fea))),
+		//new vector<int>(split_fea, split_fea + sizeof split_fea / sizeof split_fea[0]),
 		//new vector<Value>(split_value, split_value + sizeof split_value / sizeof split_value[0])
 		*(new vector<Value>( begin(split_value), end(split_value)))
-	};
+	});
 
-	return *reg_tree;
+	return reg_tree;
 }
 
 
@@ -62,11 +65,13 @@ DLLEXPORT int Dabtree(int round){
 	int bls[3] = {1,MAX_NODE_SIZE,MAX_NODE_SIZE};
 	MPI_Aint disps[3];
 	disps[0]=0;
-	disps[1]=int(&(m.split_id[0])-(int*)&m)*sizeof(int);
+	disps[1]=int(&(m.split_fea[0])-(int*)&m)*sizeof(int);
 	disps[2]=int(&(m.split_value[0])-(Value*)&m)*sizeof(int);
 	MPI_Datatype MPI_TREE;
 	MPI_Type_create_struct(3,bls,disps,types,&MPI_TREE);
 	MPI_Type_commit(&MPI_TREE);
+
+
 	cout << "start working"<< "\n";
 	if (myrank==0){
 		Master(round,comm_sz, MPI_TREE);
@@ -88,18 +93,18 @@ void Master(int round, int comm_sz, MPI_Datatype &MPI_TREE){
 	int current_count=0;
 	MPI_Status stat;
 	//local tree
-	vector<MessageTree> trees;
+	EnsembleMessageTreePtr trees(new vector<MessageTreePtr>);
 	while (current_count<=total_tree){
-		MessageTree *new_tree= new MessageTree;
+		MessageTreePtr new_tree (new MessageTree);
 
-		MPI_Recv(new_tree, 1, MPI_TREE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
+		MPI_Recv(new_tree.get(), 1, MPI_TREE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &stat);
 
 		int remote_count = new_tree->id;
 		int target_rank = stat.MPI_SOURCE;
 		cout << "master receive tree from " << target_rank << "\n";
 		current_count += 1;
 		new_tree->id = current_count;
-		trees.push_back(*new_tree);
+		trees->push_back(new_tree);
 
 		int send_count = current_count - remote_count;
 		//send tree count here
@@ -107,7 +112,7 @@ void Master(int round, int comm_sz, MPI_Datatype &MPI_TREE){
 
 		//for loop to send trees
 		for(int i= remote_count+1; i<current_count+1; i++){
-			MPI_Send(&(trees[i]), 1, MPI_TREE, target_rank, 0, MPI_COMM_WORLD);
+			MPI_Send((trees[i]).get(), 1, MPI_TREE, target_rank, 0, MPI_COMM_WORLD);
 		}
 		
 	}
@@ -117,11 +122,13 @@ void Master(int round, int comm_sz, MPI_Datatype &MPI_TREE){
 void Worker(int round, int myrank, int comm_sz, MPI_Datatype &MPI_TREE){
 	int local_count=0;
 	MPI_Status stat;
-	VecTree vec_tree;
+	EnsemblePtr vec_tree;
 	for (int i=0; i<round;i++){
 		//call train local here
-		RegTree *tree = new RegTree;//TrainLocal();
-		MessageTree message_tree(*tree);
+		RegTreePtr treeptr( new RegTree);//TrainLocal();
+
+		MessageTree message_tree = MessageTree(treeptr);
+
 		cout << "worker send tree"<< "\n";
 		message_tree.id=local_count;
 		MPI_Send(&message_tree, 1, MPI_TREE, 0, 0, MPI_COMM_WORLD);
@@ -132,7 +139,7 @@ void Worker(int round, int myrank, int comm_sz, MPI_Datatype &MPI_TREE){
 		for (int i=local_count; i < local_count+receive_count; i++){
 			MPI_Recv(&message_tree, 1, MPI_TREE, 0,0,MPI_COMM_WORLD, &stat);
 			cout << "worker receive tree"<< "\n";
-			vec_tree.push_back(message_tree.ToRegTree());
+			vec_tree->push_back(message_tree.ToRegTree());
 		}
 		local_count=message_tree.id;
 	}
