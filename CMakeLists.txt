@@ -1,10 +1,10 @@
-project(dabtree)
 cmake_minimum_required(VERSION 3.5)
+set(CMAKE_C_COMPILER "gcc")
+set(CMAKE_CXX_COMPILER "g++")
 
+project(dabtree)
 # Enable ExternalProject CMake module
 include(ExternalProject)
-
-# Download and install GoogleTest
 ExternalProject_Add(
     gtest
     URL https://github.com/google/googletest/archive/master.zip
@@ -13,33 +13,42 @@ ExternalProject_Add(
     INSTALL_COMMAND ""
 )
 
-# Get GTest source and binary directories from CMake project
 ExternalProject_Get_Property(gtest source_dir binary_dir)
-
-# Create a libgtest target to be used as a dependency by test programs
 add_library(libgtest IMPORTED STATIC GLOBAL)
 add_dependencies(libgtest gtest)
-
-# Set libgtest properties
 set_target_properties(libgtest PROPERTIES
     "IMPORTED_LOCATION" "${binary_dir}/googlemock/gtest/libgtest.a"
     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
 )
-
-# Create a libgmock target to be used as a dependency by test programs
 add_library(libgmock IMPORTED STATIC GLOBAL)
 add_dependencies(libgmock gtest)
-
-# Set libgmock properties
 set_target_properties(libgmock PROPERTIES
     "IMPORTED_LOCATION" "${binary_dir}/googlemock/libgmock.a"
     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
 )
 
-# I couldn't make it work with INTERFACE_INCLUDE_DIRECTORIES
-include_directories("${source_dir}/googletest/include"
-                    "${source_dir}/googlemock/include")
 
+ExternalProject_Add(
+    glog
+    GIT_REPOSITORY "https://github.com/google/glog"
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/glog
+    # Disable install step
+    INSTALL_COMMAND ""
+    CMAKE_ARGS "-DWITH_GFLAGS=OFF"
+)
+ExternalProject_Get_Property(glog source_dir binary_dir)
+add_library(libglog IMPORTED STATIC GLOBAL)
+add_dependencies(libglog glog)
+set_target_properties(libglog PROPERTIES
+    "IMPORTED_LOCATION" "${binary_dir}/libglog.a"
+    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
+)
+
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/gtest/src/gtest/googletest/include"
+                    "${CMAKE_CURRENT_BINARY_DIR}/gtest/src/gtest/googlemock/include"
+                    "${CMAKE_CURRENT_BINARY_DIR}/glog/src/glog-build/"
+                    "${CMAKE_CURRENT_BINARY_DIR}/glog/src/glog/src/"
+                    )
 
 SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -pthread -g -Wall")
 find_package (Threads)
@@ -59,6 +68,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+target_link_libraries(${PROJECT_NAME} libglog)
+add_library (dabcore STATIC src/core/data.cc src/core/tree.cc)
 
 find_package(MPI)
 if(MPI_FOUND)
@@ -68,6 +79,7 @@ if(MPI_FOUND)
 endif()
 
 ADD_SUBDIRECTORY(tests)
+
 
 #file(GLOB TEST_SRC_FILES tests/*.cc)
 #add_executable(test_tree ${TEST_SRC_FILES})
