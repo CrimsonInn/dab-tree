@@ -11,7 +11,7 @@
 BatchPtr read_batch_data(const std::string& file_name);
 bool write_batch_data(BatchPtr batch_data, const std::string& file_name);
 
-void read_tree();
-void write_tree();
+RegTreePtr read_tree(const std::string& file_name);
+bool write_tree(RegTreePtr tree, const std::string& file_name);
 
 #endif 
