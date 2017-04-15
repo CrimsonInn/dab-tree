@@ -3,11 +3,13 @@
 
 #include <vector>
 #include <memory>
+#include "data.h"
+#include "tree.h"
 #include "data.pb.h"
 #include "tree.pb.h"
 
-void read_batch_data();
-void write_batch_data();
+BatchPtr read_batch_data(const std::string& file_name);
+bool write_batch_data(BatchPtr batch_data, const std::string& file_name);
 
 void read_tree();
 void write_tree();

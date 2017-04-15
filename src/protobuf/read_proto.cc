@@ -32,25 +32,25 @@ BatchPtr read_batch_data(const std::string& file_name) {
   // batch->clos = read_batch_data.cols();
   unsigned int clos = read_batch_data.cols();
   for (size_t i = 0; i < read_batch_data.fea_types_size(); ++i) {
-    batch->fea_types.push_back(FeaType(read_batch_data.fea_types(i)));
+  	batch->fea_types.push_back(FeaType(read_batch_data.fea_types(i)));
   }
   // TODO: do we need to use ceil() ???
   for (size_t i = 0; i < read_batch_data.samples_size()/clos; ++i) {
-    std::vector<Value> sample;
-    for (size_t j = 0; j < clos; ++j) {
-        if (batch->fea_types[j] == CONT){
-          sample.push_back({.v = read_batch_data.samples(i * clos + j).v()});
-        } else if (batch->fea_types[j] == DISC) {
-          sample.push_back({.cls = read_batch_data.samples(i * clos + j).id()});
-        } else if (batch->fea_types[j] == RANK) {
-          // TODO: check variable format
-          sample.push_back({.n = static_cast<int>(read_batch_data.samples(i * clos + j).n())});
-        } else {
-          LOG(ERROR) << "Batch data type error.";
-          return NULL;
-        }
-    }
-    batch->samples.push_back(sample);
+  	std::vector<Value> sample;
+  	for (size_t j = 0; j < clos; ++j) {
+  		if (batch->fea_types[j] == CONT){
+  			sample.push_back({.v = read_batch_data.samples(i * clos + j).v()});
+  		} else if (batch->fea_types[j] == DISC) {
+  			sample.push_back({.cls = read_batch_data.samples(i * clos + j).cls()});
+  		} else if (batch->fea_types[j] == RANK) {
+  			// TODO: check variable format
+				sample.push_back({.n = static_cast<int>(read_batch_data.samples(i * clos + j).n())});
+  		} else {
+  			LOG(ERROR) << "Batch data type error.";
+  			return NULL;
+  		}
+  	}
+  	batch->samples.push_back(sample);
   }
 
   return batch;
@@ -64,39 +64,53 @@ void read_tree() {
 
 
 void print_batch_data(BatchPtr batch) {
-  for (auto fea : batch->fea_types) {
-    std::cout << FeaType(fea) ;
-  }
-  std::cout << std::endl;
+	
+	std::cout << "Types:" << std::endl;
+	for (auto fea : batch->fea_types) {
 
-  unsigned int cols = batch->fea_types.size();
-  unsigned int total = batch->samples.size();
-  for (auto sample : batch->samples) {
-    for (size_t j = 0; j < cols; ++j) {
-      if (batch->fea_types[j] == CONT){
-        std::cout << sample[j].v ;
-      } else if (batch->fea_types[j] == DISC) {
-        std::cout << sample[j].cls ;
-      } else if (batch->fea_types[j] == RANK) {
-        std::cout << sample[j].n ;
-      } else {
-        LOG(ERROR) << "Batch data type error.";
-      return ;
-      }
-    }
-    std::cout << std::endl;
-  }
-  return ;
+		if (FeaType(fea) == CONT) {
+			std::cout << "CONT" << " ";
+		} else if (FeaType(fea) == DISC) {
+			std::cout << "DISC" << " ";
+		} else if (FeaType(fea) == RANK) {
+			std::cout << "RANK" << " ";
+		} else {
+			LOG(ERROR) << "Batch data type error.";
+  		return ;
+		}
+	}
+	std::cout << std::endl;
+	
+	unsigned int cols = batch->fea_types.size();
+	unsigned int total = batch->samples.size();
+
+	std::cout << "Values:" << std::endl;
+	for (auto sample : batch->samples) {
+		for (size_t j = 0; j < cols; ++j) {
+			if (batch->fea_types[j] == CONT){
+				std::cout << "v: " << sample[j].v << " ";
+			} else if (batch->fea_types[j] == DISC) {
+				std::cout << "cls: " << sample[j].cls << " ";
+			} else if (batch->fea_types[j] == RANK) {
+				std::cout << "n: " << sample[j].n << " ";
+			} else {
+				LOG(ERROR) << "Batch data type error.";
+  			return ;
+			}
+		}
+		std::cout << std::endl;
+	}
+	return ;
 }
 
 
 int main(int argc, char const *argv[]) {
 
-  std::string file_name = "BATCH_DATA_FILE";
+	std::string file_name = "BATCH_DATA_FILE";
 
-  BatchPtr batch = std::make_shared<Batch>();
-  batch = read_batch_data(file_name);
-  print_batch_data(batch);
+	BatchPtr batch = std::make_shared<Batch>();
+	batch = read_batch_data(file_name);
+	print_batch_data(batch);
 
-  return 0;
+	return 0;
 }
