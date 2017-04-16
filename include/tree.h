@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "data.h"
+#include "matrix.h"
 
 const size_t MAX_NODE_SIZE = 64;
 
