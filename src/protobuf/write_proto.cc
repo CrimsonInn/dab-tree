@@ -139,43 +139,43 @@ bool write_tree(RegTreePtr tree, const std::string& file_name) {
 
 }
 
-int main(int argc, char const *argv[]) {
+// int main(int argc, char const *argv[]) {
 	
-	/* test code */
-	// std::string file_name = "BATCH_DATA_FILE";
-	// BatchPtr batch_data = std::make_shared<Batch>();;
+// 	/* test code */
+// 	// std::string file_name = "BATCH_DATA_FILE";
+// 	// BatchPtr batch_data = std::make_shared<Batch>();;
 
-	// batch_data->fea_types.push_back(CONT);
-	// batch_data->fea_types.push_back(DISC);
-	// batch_data->fea_types.push_back(RANK);
-	// std::vector<Value> sample = {{.v=1}, {.cls=0}, {.n=2}};
-	// batch_data->samples.push_back(sample);
-	// batch_data->samples.push_back(sample);
+// 	// batch_data->fea_types.push_back(CONT);
+// 	// batch_data->fea_types.push_back(DISC);
+// 	// batch_data->fea_types.push_back(RANK);
+// 	// std::vector<Value> sample = {{.v=1}, {.cls=0}, {.n=2}};
+// 	// batch_data->samples.push_back(sample);
+// 	// batch_data->samples.push_back(sample);
 
-	// write_batch_data(batch_data, file_name);
+// 	// write_batch_data(batch_data, file_name);
 
 
-	std::string tree_file_name = "TREE_DATA_FILE";
-	RegTreePtr tree = std::make_shared<RegTree>();
+// 	std::string tree_file_name = "TREE_DATA_FILE";
+// 	RegTreePtr tree = std::make_shared<RegTree>();
 
-	tree->fea_types[1] = FeaType::CONT;
-  tree->fea_types[2] = FeaType::DISC;
-  tree->fea_types[3] = FeaType::RANK;
-  tree->split_fea[1] = 0;
-  tree->split_fea[2] = 1;
-  tree->split_fea[3] = 2;
-  tree->is_leaf[1] = false;
-  tree->is_leaf[2] = false;
-  tree->is_leaf[3] = false;
-  tree->split_value[1] = {.v=0.5};
-  tree->split_value[2] = {.cls=1};
-  tree->split_value[3] = {.n=1};
-  tree->split_value[4] = {0.4};
-  tree->split_value[5] = {0.5};
-  tree->split_value[6] = {0.6};
-  tree->split_value[7] = {0.7};
+// 	tree->fea_types[1] = FeaType::CONT;
+//   tree->fea_types[2] = FeaType::DISC;
+//   tree->fea_types[3] = FeaType::RANK;
+//   tree->split_fea[1] = 0;
+//   tree->split_fea[2] = 1;
+//   tree->split_fea[3] = 2;
+//   tree->is_leaf[1] = false;
+//   tree->is_leaf[2] = false;
+//   tree->is_leaf[3] = false;
+//   tree->split_value[1] = {.v=0.5};
+//   tree->split_value[2] = {.cls=1};
+//   tree->split_value[3] = {.n=1};
+//   tree->split_value[4] = {0.4};
+//   tree->split_value[5] = {0.5};
+//   tree->split_value[6] = {0.6};
+//   tree->split_value[7] = {0.7};
 
-  write_tree(tree, tree_file_name);
+//   write_tree(tree, tree_file_name);
 
-	return 0;
-}
+// 	return 0;
+// }

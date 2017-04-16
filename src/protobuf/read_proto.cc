@@ -200,18 +200,18 @@ void print_tree(RegTreePtr tree) {
 }
 
 
-int main(int argc, char const *argv[]) {
+// int main(int argc, char const *argv[]) {
 
-	// std::string file_name = "BATCH_DATA_FILE";
+// 	// std::string file_name = "BATCH_DATA_FILE";
 
-	// BatchPtr batch = std::make_shared<Batch>();
-	// batch = read_batch_data(file_name);
-	// print_batch_data(batch);
+// 	// BatchPtr batch = std::make_shared<Batch>();
+// 	// batch = read_batch_data(file_name);
+// 	// print_batch_data(batch);
 
-	std::string tree_file_name = "TREE_DATA_FILE";
-	RegTreePtr tree = std::make_shared<RegTree>();
-	tree = read_tree(tree_file_name);
-	print_tree(tree);
+// 	std::string tree_file_name = "TREE_DATA_FILE";
+// 	RegTreePtr tree = std::make_shared<RegTree>();
+// 	tree = read_tree(tree_file_name);
+// 	print_tree(tree);
 
-	return 0;
-}
+// 	return 0;
+// }
