@@ -1,0 +1,24 @@
+// protobuf for dab-tree
+
+syntax = "proto3";
+package data;
+
+enum FeaType {
+  CONT = 0;
+  DISC = 1;
+  RANK = 2;
+}
+message Value {
+  oneof values {
+    float v = 1;
+    uint64 cls = 2;
+    int64 n = 3;
+  }
+}
+
+message Batch {
+  uint64 rows = 1; //row number
+  uint64 cols = 2; //column number
+  repeated FeaType fea_types = 3 [packed=true];
+  repeated Value samples = 4;
+}
