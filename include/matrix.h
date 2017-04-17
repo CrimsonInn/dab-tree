@@ -56,6 +56,10 @@ public:
     data_ = values;
   }
 
+  void Add(const std::vector<Value>& values) {
+    data_.push_back(values);
+  }
+
 
 private:
   std::vector<std::vector<Value>> data_;

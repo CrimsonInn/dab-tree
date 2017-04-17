@@ -38,9 +38,19 @@ public:
 
   void Copy(size_t row_id,
             const std::vector<Value>& feas,
-            const std::vector<Value>& values) {
+            const std::vector<Value>& values,
+            float w=1.0) {
     split_fea_.Copy(row_id, feas);
     split_value_.Copy(row_id, values);
+    weight[row_id] = w;
+  }
+
+  void Add(const std::vector<Value>& feas,
+           const std::vector<Value>& values,
+           float w=1.0) {
+    split_fea_.Add(feas);
+    split_value_.Add(values);
+    weight.push_back(w);
   }
 
   void SetType(const std::vector<FeaType>& types) {
