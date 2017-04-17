@@ -21,7 +21,7 @@ bool write_batch_data(BatchPtr batch_data, const std::string& file_name) {
   // compatible with the version of the headers we compiled against.
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-  data::Batch write_batch_data;
+  data_::Batch write_batch_data;
 
   // Read the existing address book.
   std::fstream input(file_name, std::ios::in | std::ios::binary);
@@ -37,7 +37,7 @@ bool write_batch_data(BatchPtr batch_data, const std::string& file_name) {
   write_batch_data.set_cols(value_cols);
 
   for (auto fea_type : batch_data->fea_types) {
-  	write_batch_data.add_fea_types(data::FeaType(fea_type));
+  	write_batch_data.add_fea_types(data_::FeaType(fea_type));
   }
 
   for (auto sample_row : batch_data->samples) {

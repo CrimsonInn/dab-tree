@@ -14,7 +14,7 @@ enum FeaType {
 union Value {
   float v; //type 0, continuous feature
   size_t cls; // type 1, discrete feature
-  int n; //type 2, rank feature
+  int level; //type 2, rank feature
 };
 
 struct Batch {

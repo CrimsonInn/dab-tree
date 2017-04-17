@@ -3,41 +3,67 @@
 
 #include <memory>
 #include <vector>
+#include <glog/logging.h>
 #include "data.h"
 
 class Matrix {
 public:
-  std::vector<std::vector<Value>> data;
-  std::vector<FeaType> fea_types;
 
   Matrix(std::vector<std::vector<Value>>& d,
          std::vector<FeaType>& t) :
-    data(d), fea_types(t) {}
+    data_(d), fea_types_(t) {}
 
   Matrix(size_t width, size_t height) {
-    data = std::vector<std::vector<Value>>(height, std::vector<Value>(width));
+    data_ = std::vector<std::vector<Value>>(height, std::vector<Value>(width));
   }
 
-//  Matrix(size_t width, size_t height, FeaType type) {
-//    if (type == FeaType::CONT) {
-//        data = std::vector<std::vector<Value>>(height,
-//                                               std::vector<Value>(width, {.v=0.0}));
-//      } else if ()
-//  }
+  Matrix(size_t width, size_t height, FeaType type) {
+    fea_types_ = {type};
+    if (type == FeaType::CONT) {
+        data_ = std::vector<std::vector<Value>>(height, std::vector<Value>(width, {.v=0.0}));
+      } else if (type == FeaType::DISC) {
+        data_ = std::vector<std::vector<Value>>(height, std::vector<Value>(width, {.cls=0}));
+      } else if (type == FeaType::RANK) {
+        data_ = std::vector<std::vector<Value>>(height, std::vector<Value>(width, {.level=0}));
+      }
+  }
 
   size_t GetWidth() {
-    return data[0].size();
+    return data_[0].size();
   }
 
   size_t GetHeight() {
-    return data.size();
+    return data_.size();
+  }
+
+  Value operator() (size_t row_id, size_t col_id) {
+    return data_[row_id][col_id];
+  }
+
+  FeaType fea_type(size_t col_id) {
+    return fea_types_[col_id];
+  }
+
+  void SetType(const std::vector<FeaType>& types) {
+    fea_types_ = types;
+  }
+
+  void Copy(size_t row_id, const std::vector<Value>& values) {
+    data_[row_id] = values;
+  }
+
+  void Copy(const std::vector<std::vector<Value>>& values) {
+    data_ = values;
   }
 
 
+private:
+  std::vector<std::vector<Value>> data_;
+  std::vector<FeaType> fea_types_;
 };
 
 typedef std::shared_ptr<Matrix> MatrixPtr;
-
+typedef std::shared_ptr<std::vector<float>> VectorPtr;
 
 
 #endif  // DABTREE_MATRIX_H_

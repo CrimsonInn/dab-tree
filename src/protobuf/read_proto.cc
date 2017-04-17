@@ -13,7 +13,7 @@ BatchPtr read_batch_data(const std::string& file_name) {
   LOG(INFO) << "Begin read batch data ...";
 
   BatchPtr batch = std::make_shared<Batch>();
-  data::Batch read_batch_data;
+  data_::Batch read_batch_data;
 
   // Read the existing address book.
   std::fstream input(file_name, std::ios::in | std::ios::binary);
@@ -37,12 +37,12 @@ BatchPtr read_batch_data(const std::string& file_name) {
   	std::vector<Value> sample;
   	for (size_t j = 0; j < clos; ++j) {
   		if (batch->fea_types[j] == CONT){
-  			sample.push_back({.v = read_batch_data.samples(i * clos + j).v()});
+                        sample.push_back({.v = read_batch_data.samples(i * clos + j).v();});
   		} else if (batch->fea_types[j] == DISC) {
-  			sample.push_back({.cls = read_batch_data.samples(i * clos + j).cls()});
+                        sample.push_back({.cls = read_batch_data.samples(i * clos + j).cls();});
   		} else if (batch->fea_types[j] == RANK) {
   			// TODO: check variable format
-				sample.push_back({.n = static_cast<int>(read_batch_data.samples(i * clos + j).n())});
+                                sample.push_back({.n = static_cast<int>(read_batch_data.samples(i * clos + j).n());});
   		} else {
   			LOG(ERROR) << "Batch data type error.";
   			return NULL;
