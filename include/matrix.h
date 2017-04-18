@@ -56,6 +56,14 @@ public:
     data_ = values;
   }
 
+  std::vector<Value>& Get(size_t row_id = -1){
+    if (row_id== -1){
+      row_id = this->GetHeight();
+    }
+    return data_[row_id];
+  }
+
+
   void Add(const std::vector<Value>& values) {
     data_.push_back(values);
   }

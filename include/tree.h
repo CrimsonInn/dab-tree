@@ -3,10 +3,13 @@
 
 #include <vector>
 #include <memory>
+#include <cstdlib>
+#include <ctime>
 #include "data.h"
+#include "message_tree.h"
 #include "matrix.h"
 
-const size_t MAX_NODE_SIZE = 64;
+//const size_t MAX_NODE_SIZE = 64;
 
 
 /* Regression Tree
@@ -53,9 +56,58 @@ public:
     weight.push_back(w);
   }
 
+  void Add() {
+    split_fea_.Add(std::vector<Value>(MAX_NODE_SIZE, {.v=0.0}));
+    split_value_.Add(std::vector<Value>(MAX_NODE_SIZE, {.v=0.0}));
+    weight.push_back(1.0);
+  }
+
+  void AddRandom(){
+    srand(time(NULL));
+    std::vector<Value> fea(MAX_NODE_SIZE, {.v=0.0});
+    std::vector<Value> value(MAX_NODE_SIZE, {.v=0.0});
+    for (int i=0; i<MAX_NODE_SIZE; i++){
+      fea[i].v=std::rand();
+      value[i].v=std::rand();
+    }
+    split_fea_.Add(fea);
+    split_value_.Add(value);
+    weight.push_back(1.0);
+  }
+
   void SetType(const std::vector<FeaType>& types) {
     split_value_.SetType(types);
   }
+
+  MessageTreePtr GetMessageTree(size_t id){
+    MessageTreePtr message_tree ( new MessageTree(
+          id,
+          weight[id],
+          split_fea_.Get(id),
+          split_value_.Get(id)
+        )
+      );
+    return message_tree;
+  }
+
+  void Print(size_t id){
+      std::cout << "printing message tree ---------------- \n";
+      std::cout << "id: " << id << "\n";
+      std::cout << "weight: " << weight[id] << "\n";
+      std::cout << "feas: ";
+      for (int i=0; i<MAX_NODE_SIZE; i++){std::cout << split_fea_.Get(id)[i].v<<", ";}
+      std::cout << "\n";
+      std::cout << "values: ";
+      for (int i=0; i<MAX_NODE_SIZE; i++){std::cout << split_value_.Get(id)[i].v<<", ";}
+      std::cout << "\n done ---------------- \n \n";
+  }
+
+  void Copy(MessageTreePtr tree_ptr) {
+    split_fea_.Copy(tree_ptr->id, *(new std::vector<Value>( std::begin(tree_ptr->feas), std::end(tree_ptr->feas))));
+    split_value_.Copy(tree_ptr->id, *(new std::vector<Value>( std::begin(tree_ptr->values), std::end(tree_ptr->values))));
+    weight[tree_ptr->id] = tree_ptr->weight;
+  }
+
 
 private:
   Matrix split_fea_ = Matrix(MAX_NODE_SIZE, 1, FeaType::DISC);
