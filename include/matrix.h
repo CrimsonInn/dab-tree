@@ -64,6 +64,12 @@ public:
     data_.push_back(values);
   }
 
+  void Add() {
+    std::vector<Value> values;
+    values.resize(MAX_NODE_SIZE);
+    data_.push_back(values);
+  }
+
   void Sort(size_t col_id, size_t low, size_t high) {
     FeaType type = fea_type(col_id);
     if (type == FeaType::CONT) {
@@ -85,6 +91,21 @@ public:
                       return a.level < b.level;
                   });
       }
+  }
+
+  size_t Split(size_t col_id, size_t low, size_t high, size_t cls) {
+    CHECK_EQ(fea_type(col_id), FeaType::DISC);
+
+    std::sort(data_.begin() + low,
+              data_.begin() + high,
+              [cls](const Value& a, const Value& b) {
+                  return (a.cls-cls)*(a.cls-cls) > (b.cls-cls)*(b.cls-cls);
+              });
+    size_t value = data_[high-1][col_id].cls;
+    for (size_t i = high-1; i >= low; --i) {
+      if (data_[i][col_id].cls != value) return i+1;
+    }
+    return low;
   }
 
   float ColMean(size_t col_id, size_t low, size_t high) {

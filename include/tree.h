@@ -8,6 +8,12 @@
 
 const size_t MAX_NODE_SIZE = 64;
 
+struct node {
+  size_t row_id;
+  size_t col_id;
+  size_t low;
+  size_t high;
+};
 
 /* Regression Tree
  * 1-based indexing
@@ -55,9 +61,17 @@ public:
     weight.push_back(w);
   }
 
+  void Add() {
+    split_fea_.Add();
+    split_value_.Add();
+    weight.push_back(1.0);
+  }
+
   void SetType(const std::vector<FeaType>& types) {
     split_value_.SetType(types);
   }
+
+  void GrowNode(MatrixPtr batch_ptr, node cur_node);
 
 private:
   Matrix split_fea_ = Matrix(MAX_NODE_SIZE, 1, FeaType::DISC);
