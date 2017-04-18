@@ -1,6 +1,7 @@
 #include "tree.h"
 #include <glog/logging.h>
 
+const size_t MIN_SAMPLENUM_SPLIT = 10;
 
 
 bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
@@ -39,3 +40,66 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
     }
   return true;
 }
+
+struct node {
+  size_t row_id;
+  size_t col_id;
+  size_t low;
+  size_t high;
+};
+
+void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node,
+                       size_t low, size_t high) {
+  if (cur_node.col_id >= MAX_NODE_SIZE) return;
+  if (high - low <= MIN_SAMPLENUM_SPLIT) {
+      split_value_.SetValue(cur_node.row_id, cur_node.col_id, {.v=batch_ptr->ColMean(0, low, high)});
+      split_fea_.SetValue(cur_node.row_id, cur_node.col_id, {.cls = 0});
+      return;
+  }
+
+  float best_sse = 0.0;
+  size_t best_fea = 0;
+  for (size_t fea_id = 1; fea_id < batch_ptr->GetWidth(); ++fea_id) {
+    batch_ptr->Sort(fea_id, cur_node.low, cur_node.high);
+
+    if (batch_ptr->fea_type(fea_id) == FeaType::DISC) {
+      std::vector<size_t> counts;
+      std::vector<float> sss = {batch_ptr->};
+      std::vector<float> sums;
+      std::vector<size_t> splits;
+      float count = 1;
+      for (size_t cur_row = low+1; cur_row < high; ++cur_row) {
+
+      }
+
+    }
+
+    size_t split_row = cur_node.low + MIN_SAMPLENUM_SPLIT;
+    while (split_row <= high) {
+      float cur_sse = batch_ptr->SSE(cur_node.low, split_row) + SSE(split_row, cur_node.high);
+      if (best_fea == 0 || cur_sse < best_sse) {
+        best_sse = cur_sse;
+        best_fea = fea_id;
+      }
+    }
+
+  }
+}
+
+void RegTree::TrainOneTree(MatrixPtr batch_ptr, float w) {
+  std::vector<Value> feas;
+  feas.resize(MAX_NODE_SIZE, {.cls=0});
+  std::vector<Value> values;
+  values.resize(MAX_NODE_SIZE, {.v=0.0});
+
+  std::vector<node> non_terminal = {{.id=1, .low=0, .high=batch_ptr->GetHeight()}};
+  while (!non_terminal.empty()) {
+    auto cur_node = non_terminal.back();
+    non_terminal.pop_back();
+    for (size_t fea_id = 1; fea_id < batch_ptr->GetWidth(); ++fea_id) {
+      batch_ptr->Sort(fea_id, cur_node.low, cur_node.high);
+    }
+
+  }
+}
+

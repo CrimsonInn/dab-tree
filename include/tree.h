@@ -18,7 +18,9 @@ class RegTree {
 public:
   std::vector<float> weight = {1.0};
   std::vector<size_t> id = {1};
+
   bool Predict(MatrixPtr batch_ptr, VectorPtr result_ptr);
+  void TrainOneTree(MatrixPtr batch_ptr);
 
   size_t NumTrees() {
     return split_value_.GetHeight();
