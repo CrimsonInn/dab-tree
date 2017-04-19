@@ -1,18 +1,18 @@
 # Distributed Asynchronous Boosting Tree (DAB Tree)
 Team: Qin Lyu, Bingfeng Xia, MingLong Wu, Hengte Lin
 
-## Introduction
+## Introduction:
 The goal of this project is to apply parallel computation techniques taught in Harvard CS205 course to a data science or a computational science problem. In general, by massive parallel computation, an algorithm is expected to accommodate larger datasets or to perform large scale computation efficiently.
     Gradient boosting decision tree (GBDT) is a machine learning technique that can be used for regression and classification problem [1]. GBDT was proposed by Jerome H. Friedman [2,3] that constructs additive model using decision tree as a weak learner. Advantages of GBDT include its capability to model feature interaction and to perform inherent feature selection.
 GBDT has been applied to wide varities of applications including physics [4], computer vision [5], and web-search ranking [6, 7]. To cope with increased scale of datasets, a distributed and parallel version of GBDT will be implemented in this project. The scaling property of the implemented system will be tested based on a real world application.
 
-## Goal
+## Goal:
 A distributed asynchronous stochastic gradient boosting system will be implemented and be tested on a HPC cluster. In addition, parallel computing will be used to accelerate training models on each node.
 
-## Performance
+## Performance:
 Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with existing Gradient Boosting Tree libraries.
 
-## Reference
+## Reference:
 [1] Wikipedia, https://en.wikipedia.org/wiki/Gradient_boosting
 [2] Friedman, Jerome H. "Greedy function approximation: a gradient boosting machine." Annals of statistics (2001): 1189-1232.
 [3] Friedman, Jerome H. "Stochastic gradient boosting." Computational Statistics & Data Analysis 38.4 (2002): 367-378.
