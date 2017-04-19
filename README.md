@@ -1,19 +1,22 @@
 # Distributed Asynchronous Boosting Tree (DAB Tree)
 Team: Qin Lyu, Bingfeng Xia, MingLong Wu, Hengte Lin
 
-## Motivation:
-Gradient boosting decision tree (GBDT) is widely used in industry. However, people sometimes find it too slow to train a GBDT model on one server, especially on large-scale and high-dimensional dataset. In this project, we will build a distributed and parallel version of GBDT and test its scaling property on real world applications.
-## Goal:
-We will implement distributed asynchronous stochastic gradient boosting on HPC cluster, and use parallel computing to accelerate training on each node.
-## Background
-Gradient boosting decision tree(GBDT) is a powerful machine learning technique for regression and classification problems, which is first proposed in the paper “Gradient Boosting Decision Trees Algorithm and its modern offsprings” by Jerome H. Friedman.
-GBDT constructs additive regression model utilizing decision trees as the weak learner. GBDT is able to model feature interactions and inherently perform feature selection. It is adaptable 
+## Introduction
+The goal of this project is to apply parallel computation techniques taught in Harvard CS205 course to a data science or a computational science problem. In general, by massive parallel computation, an algorithm is expected to accommodate larger datasets or to perform large scale computation efficiently.
+    Gradient boosting decision tree (GBDT) is a machine learning technique that can be used for regression and classification problem [1]. GBDT was proposed by Jerome H. Friedman [2,3] that constructs additive model using decision tree as a weak learner. Advantages of GBDT include its capability to model feature interaction and to perform inherent feature selection.
+GBDT has been applied to wide varities of applications including physics [4], computer vision [5], and web-search ranking [6, 7]. To cope with increased scale of datasets, a distributed and parallel version of GBDT will be implemented in this project. The scaling property of the implemented system will be tested based on a real world application.
+
+## Goal
+A distributed asynchronous stochastic gradient boosting system will be implemented and be tested on a HPC cluster. In addition, parallel computing will be used to accelerate training models on each node.
 
 ## Performance
-Scalability and efficiency of algorithm will be tested. It is also possible to compare accuracy and training speed with existing Gradient Boosting Tree libraries.
+Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with existing Gradient Boosting Tree libraries.
 
-## Specs
-Language: C++11 (multithreading), Python (interface), MPI (distributed computation)
-
-
-
+## Reference
+[1] Wikipedia, https://en.wikipedia.org/wiki/Gradient_boosting
+[2] Friedman, Jerome H. "Greedy function approximation: a gradient boosting machine." Annals of statistics (2001): 1189-1232.
+[3] Friedman, Jerome H. "Stochastic gradient boosting." Computational Statistics & Data Analysis 38.4 (2002): 367-378.
+[4] Roe, Byron P., et al. "Boosted decision trees as an alternative to artificial neural networks for particle identification." Nuclear Instruments and Methods in Physics Research Section A: Accelerators, Spectrometers, Detectors and Associated Equipment 543.2 (2005): 577-584.
+[5] Bissacco, Alessandro, Ming-Hsuan Yang, and Stefano Soatto. "Fast human pose estimation using appearance and motion via multi-dimensional boosting regression." Computer Vision and Pattern Recognition, 2007. CVPR'07. IEEE Conference on. IEEE, 2007.
+[6] Mohan, Ananth, Zheng Chen, and Kilian Q. Weinberger. "Web-search ranking with initialized gradient boosted regression trees." Yahoo! Learning to Rank Challenge. 2011.
+[7] Chapelle, Olivier, and Yi Chang. "Yahoo! learning to rank challenge overview." Yahoo! Learning to Rank Challenge. 2011.
