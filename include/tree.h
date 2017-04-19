@@ -8,7 +8,6 @@
 
 const size_t MAX_NODE_SIZE = 64;
 
-
 /* Regression Tree
  * 1-based indexing
  * If node is leaf, split_value is the predicted value;
@@ -57,14 +56,22 @@ public:
     split_value_.SetType(types);
   }
 
+  MatrixPtr GetSplitFea() {
+    MatrixPtr sfptr = std::make_shared<Matrix>(split_fea_);
+    return sfptr;
+  }
+
+  MatrixPtr GetSplitValue() {
+    MatrixPtr svptr = std::make_shared<Matrix>(split_value_);
+    return svptr;
+  }
+
 private:
   Matrix split_fea_ = Matrix(MAX_NODE_SIZE, 1, FeaType::DISC);
   Matrix split_value_ = Matrix(MAX_NODE_SIZE, 1);
 
 };
 
-
 typedef std::shared_ptr<RegTree> RegTreePtr;
-
 
 #endif  // DABTREE_TREE_H_

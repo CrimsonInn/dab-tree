@@ -4,6 +4,8 @@
 #include "proto_func.h"
 #include <glog/logging.h>
 
+// const size_t MAX_NODE_SIZE = 64;
+
 bool write_batch_data(BatchPtr batch_data, const std::string& file_name) {
 
   LOG(INFO) << "Begin write batch data ...";
@@ -21,7 +23,7 @@ bool write_batch_data(BatchPtr batch_data, const std::string& file_name) {
   // compatible with the version of the headers we compiled against.
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-  data_::Batch write_batch_data;
+  rawdata::Batch write_batch_data;
 
   // Read the existing address book.
   std::fstream input(file_name, std::ios::in | std::ios::binary);
@@ -37,7 +39,7 @@ bool write_batch_data(BatchPtr batch_data, const std::string& file_name) {
   write_batch_data.set_cols(value_cols);
 
   for (auto fea_type : batch_data->fea_types) {
-  	write_batch_data.add_fea_types(data_::FeaType(fea_type));
+  	write_batch_data.add_fea_types(rawdata::FeaType(fea_type));
   }
 
   for (auto sample_row : batch_data->samples) {
@@ -47,7 +49,7 @@ bool write_batch_data(BatchPtr batch_data, const std::string& file_name) {
   		} else if (batch_data->fea_types[i] == DISC) {
   			write_batch_data.add_samples()->set_cls(sample_row[i].cls);
   		} else if (batch_data->fea_types[i] == RANK) {
-  			write_batch_data.add_samples()->set_n(sample_row[i].n);
+  			write_batch_data.add_samples()->set_level(sample_row[i].level);
   		} else {
   			LOG(ERROR) << "Batch data type error.";
   			return false;
@@ -71,7 +73,47 @@ bool write_batch_data(BatchPtr batch_data, const std::string& file_name) {
 
 }
 
-bool write_tree(RegTreePtr tree, const std::string& file_name) {
+
+bool write_matrix_data(MatrixPtr matrixptr, dabtree::Matrix write_matrix) {
+
+  LOG(INFO) << "Begin write matrix ...";
+
+  // TODO: 
+
+  // write tree data into protobuf
+
+  unsigned int width = matrixptr->GetWidth();
+  unsigned int height = matrixptr->GetHeight();
+  write_matrix.set_width(width);
+  write_matrix.set_height(height);
+
+  for (size_t i = 0; i < width; ++i) {
+    write_matrix.add_fea_types(dabtree::FeaType(matrixptr->fea_type(i)));
+  }
+
+  for (size_t i = 0; i < height; ++i) {
+    for (size_t j = 0; j < width; ++j) {
+      auto &matrix = (*matrixptr);
+      std::cout << matrixptr->fea_type(j) << std::endl;
+      if (matrixptr->fea_type(j) == CONT) { 
+        write_matrix.add_data()->set_v(matrix(i, j).v);
+      } else if (matrixptr->fea_type(j) == DISC) {
+        write_matrix.add_data()->set_cls(matrix(i, j).cls);
+      } else if (matrixptr->fea_type(j) == RANK) {
+        write_matrix.add_data()->set_level(matrix(i, j).level);
+      } else {
+        LOG(ERROR) << "Batch data type error.";
+        return false;
+      }
+    }
+  }
+
+  return true;
+
+}
+
+
+bool write_tree(RegTreePtr treeptr, const std::string& file_name) {
 
 	LOG(INFO) << "Begin write tree ...";
 
@@ -93,35 +135,48 @@ bool write_tree(RegTreePtr tree, const std::string& file_name) {
   }
 
   // write tree data into protobuf
-  unsigned int tree_id = tree->id;
-  float tree_weight = tree->weight;
-  write_tree.set_id(tree_id);
-  write_tree.set_weight(tree_weight);
+  // unsigned int tree_id = tree->id;
+  // float tree_weight = tree->weight;
+  // write_tree.set_id(tree_id);
+  // write_tree.set_weight(tree_weight);
 
-  for (auto fea_type : tree->fea_types) {
-  	write_tree.add_fea_types(dabtree::FeaType(fea_type));
+//bool write_matrix_data(MatrixPtr matrixptr, dabtree::Matrix write_matrix) {
+
+  MatrixPtr split_fea_ptr = treeptr->GetSplitFea();
+  if (write_matrix_data(split_fea_ptr, write_tree.split_fea())) {
+    LOG(INFO) << "Finish write fea_types." ;
   }
 
-  for (auto sf : tree->split_fea) {
-  	write_tree.add_split_fea(sf);
+  MatrixPtr split_value_ptr = treeptr->GetSplitValue();
+  if (write_matrix_data(split_value_ptr, write_tree.split_value())) {
+    LOG(INFO) << "Finish write fea_value." ;
   }
 
-	for (size_t i = 0; i < tree->fea_types.size(); ++i) {
-		if (tree->fea_types[i] == CONT){
-			write_tree.add_split_value()->set_v(tree->split_value[i].v);
-		} else if (tree->fea_types[i] == DISC) {
-			write_tree.add_split_value()->set_cls(tree->split_value[i].cls);
-		} else if (tree->fea_types[i] == RANK) {
-			write_tree.add_split_value()->set_n(tree->split_value[i].n);
-		} else {
-			LOG(ERROR) << "Batch data type error.";
-			return false;
-		}
-	}
 
-  for (auto il : tree->is_leaf) {
-  	write_tree.add_is_leaf(il);
-  }
+ //  for (auto fea_type : tree->fea_types) {
+ //  	write_tree.add_fea_types(dabtree::FeaType(fea_type));
+ //  }
+
+ //  for (auto sf : tree->split_fea) {
+ //  	write_tree.add_split_fea(sf);
+ //  }
+
+	// for (size_t i = 0; i < tree->fea_types.size(); ++i) {
+	// 	if (tree->fea_types[i] == CONT){
+	// 		write_tree.add_split_value()->set_v(tree->split_value[i].v);
+	// 	} else if (tree->fea_types[i] == DISC) {
+	// 		write_tree.add_split_value()->set_cls(tree->split_value[i].cls);
+	// 	} else if (tree->fea_types[i] == RANK) {
+	// 		write_tree.add_split_value()->set_n(tree->split_value[i].n);
+	// 	} else {
+	// 		LOG(ERROR) << "Batch data type error.";
+	// 		return false;
+	// 	}
+	// }
+
+ //  for (auto il : tree->is_leaf) {
+ //  	write_tree.add_is_leaf(il);
+ //  }
 
 	// Write the new address book back to disk.
   std::fstream output(file_name, std::ios::out | std::ios::trunc | std::ios::binary);
@@ -138,6 +193,72 @@ bool write_tree(RegTreePtr tree, const std::string& file_name) {
   return true;
 
 }
+
+
+bool write_matrix(MatrixPtr matrixptr, const std::string& file_name) {
+
+  LOG(INFO) << "Begin write matrix ...";
+
+  // TODO: 
+
+  // Verify that the version of the protobuf that we linked against is
+  // compatible with the version of the headers we compiled against.
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  dabtree_matrix::Matrix write_matrix;
+
+  // Read the existing address book.
+  std::fstream input(file_name, std::ios::in | std::ios::binary);
+  if (!input) {
+    LOG(INFO) << file_name << ": File not found. Creating a new file.";
+  } else if (!write_matrix.ParseFromIstream(&input)) {
+    LOG(ERROR) << "Failed to parse matrix data.";
+    return false;
+  }
+
+  // write tree data into protobuf
+
+  unsigned int width = matrixptr->GetWidth();
+  unsigned int height = matrixptr->GetHeight();
+  write_matrix.set_width(width);
+  write_matrix.set_height(height);
+
+  for (size_t i = 0; i < width; ++i) {
+    write_matrix.add_fea_types(dabtree_matrix::FeaType(matrixptr->fea_type(i)));
+  }
+
+  for (size_t i = 0; i < height; ++i) {
+    for (size_t j = 0; j < width; ++j) {
+      auto &matrix = (*matrixptr);
+      if (matrixptr->fea_type(j) == FeaType::CONT) { 
+        write_matrix.add_data()->set_v(matrix(i, j).v);
+      } else if (matrixptr->fea_type(j) == FeaType::DISC) {
+        write_matrix.add_data()->set_cls(matrix(i, j).cls);
+      } else if (matrixptr->fea_type(j) == FeaType::RANK) {
+        write_matrix.add_data()->set_level(matrix(i, j).level);
+      } else {
+        LOG(ERROR) << "Batch data type error.";
+        return false;
+      }
+    }
+  }
+
+  // Write the new address book back to disk.
+  std::fstream output(file_name, std::ios::out | std::ios::trunc | std::ios::binary);
+  if (!write_matrix.SerializeToOstream(&output)) {
+    LOG(ERROR) << "Failed to write matrix.";
+    return false;
+  } else {
+    LOG(INFO) << "Success!";
+  }
+
+  // Optional:  Delete all global objects allocated by libprotobuf.
+  google::protobuf::ShutdownProtobufLibrary();
+
+  return true;
+
+}
+
 
 // int main(int argc, char const *argv[]) {
 	

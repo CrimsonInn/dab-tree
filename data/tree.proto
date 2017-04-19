@@ -1,4 +1,5 @@
 // protobuf for dab-tree
+// protobuf for dab-tree
 
 syntax = "proto3";
 package dabtree;
@@ -13,16 +14,25 @@ message Value {
   oneof values {
     float v = 1;
     uint64 cls = 2;
-    int64 n = 3;
+    int64 level = 3;
   }
+}
+
+message Matrix {
+  uint64 width = 1; //row number
+  uint64 height = 2; //column number
+  repeated FeaType fea_types = 3 [packed=true];
+  repeated Value data = 4;
 }
 
 message RegTree {
   // uint64 max_node_size = 0;
-  uint64 id = 1;
-  float weight = 2;
-  repeated FeaType fea_types = 3 [packed=true];
-  repeated uint64 split_fea = 4 [packed=true];
-  repeated Value split_value = 5;
-  repeated bool is_leaf = 6 [packed=true];
+  // uint64 id = 1;
+  // float weight = 2;
+  // repeated uint64 id = 1 [packed=true];
+  // repeated float weight = 2 [packed=true];
+  // repeated FeaType fea_types = 3 [packed=true];
+  Matrix split_fea = 3;
+  Matrix split_value = 4;
+  // repeated bool is_leaf = 6 [packed=true];
 }

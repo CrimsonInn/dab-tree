@@ -10,8 +10,8 @@ DIR_BUILD = ./build
 CC = c++
 CFLAGS = -std=gnu++11 `pkg-config --cflags --libs protobuf` -lglog
 
-objects = $(DIR_BUILD)/main.o $(DIR_BUILD)/write_proto.o $(DIR_BUILD)/read_proto.o \
-		  $(DIR_INC)/data.pb.cc $(DIR_INC)/tree.pb.cc
+objects = $(DIR_BUILD)/main.o $(DIR_BUILD)/write_proto.o \
+		  $(DIR_INC)/data.pb.cc $(DIR_INC)/tree.pb.cc $(DIR_INC)/matrix.pb.cc 
 
 .PHONY: all
 all: _PRE output
@@ -20,6 +20,7 @@ all: _PRE output
 proto: $(DIR_DATA_SRC)/data.proto $(DIR_DATA_SRC)/tree.proto
 	protoc -I=$(DIR_DATA_SRC) --cpp_out=$(DIR_INC) $(DIR_DATA_SRC)/data.proto
 	protoc -I=$(DIR_DATA_SRC) --cpp_out=$(DIR_INC) $(DIR_DATA_SRC)/tree.proto
+	protoc -I=$(DIR_DATA_SRC) --cpp_out=$(DIR_INC) $(DIR_DATA_SRC)/matrix.proto
 
 output: $(objects) proto
 	$(CC) $(CFLAGS) $(objects) -o output 

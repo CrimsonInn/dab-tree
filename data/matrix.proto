@@ -1,7 +1,7 @@
 // protobuf for dab-tree
 
 syntax = "proto3";
-package rawdata;
+package dabtree_matrix;
 
 enum FeaType {
   CONT = 0;
@@ -16,9 +16,9 @@ message Value {
   }
 }
 
-message Batch {
-  uint64 rows = 1; //row number
-  uint64 cols = 2; //column number
+message Matrix {
+  uint64 width = 1; //row number
+  uint64 height = 2; //column number
   repeated FeaType fea_types = 3 [packed=true];
-  repeated Value samples = 4;
+  repeated Value data = 4;
 }
