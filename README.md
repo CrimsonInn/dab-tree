@@ -10,7 +10,7 @@ Team: Qin Lyu, Bingfeng Xia, MingLong Wu, Hengte Lin
 A distributed asynchronous stochastic gradient boosting system will be implemented and be tested on a HPC cluster. In addition, parallel computing will be used to accelerate training models on each node.
 
 ## Performance
-Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with existing Gradient Boosting Tree libraries.
+Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with an existing Gradient Boosting Tree library.
 
 ## Reference
 1. Wikipedia, https://en.wikipedia.org/wiki/Gradient_boosting
