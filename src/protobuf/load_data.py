@@ -17,9 +17,9 @@ def load_raw_data(file_name):
 
   # transform data
   fea_types = ['DISC','DISC','DISC','DISC',
-               'RANK','CONT','CONT','DISC',
+               'CONT','CONT','CONT','DISC',
                'DISC','CONT','CONT','CONT',
-               'CONT','CONT','CONT','CONT','RANK']
+               'CONT','CONT','CONT','CONT','CONT']
   fea_types = np.array(fea_types)
   data_filled['gender']=(data_filled.gender == 'M')*1
   data_filled['voted']=(data_filled.voted == 'Y')*1
