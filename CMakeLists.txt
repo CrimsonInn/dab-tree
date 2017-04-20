@@ -56,12 +56,13 @@ find_package(Protobuf REQUIRED)
 
 
 include_directories(dabtree ${PROJECT_SOURCE_DIR}/include)
-#include_directories(dabtree ${CMAKE_CURRENT_BINARY_DIR}/data)
+include_directories(dabtree ${CMAKE_CURRENT_BINARY_DIR}/data)
 
 
 file(GLOB SOURCES
     src/*.cc
     src/core/*.cc
+    src/protobuf/*.cc
     include/*.h
     data/*.proto
 )
@@ -71,10 +72,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} libglog ${PROTOBUF_LIBRARY})
+target_link_libraries(${PROJECT_NAME} libglog proto ${PROTOBUF_LIBRARY})
 
 #add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/protobuf/read_proto.cc src/protobuf/write_proto.cc)
 add_library (dabcore STATIC src/core/data.cc src/core/tree.cc)
 
 ADD_SUBDIRECTORY(tests)
-#ADD_SUBDIRECTORY(data)
+ADD_SUBDIRECTORY(data)
