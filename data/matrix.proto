@@ -8,6 +8,7 @@ enum FeaType {
   DISC = 1;
   RANK = 2;
 }
+
 message Value {
   oneof values {
     float v = 1;
