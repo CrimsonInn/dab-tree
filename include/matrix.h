@@ -28,7 +28,12 @@ public:
       }
   }
 
+  bool Empty() {
+    return data_.empty();
+  }
+
   size_t GetWidth() {
+    if (GetHeight() == 0) return 0;
     return data_[0].size();
   }
 
@@ -37,11 +42,18 @@ public:
   }
 
   Value operator() (size_t row_id, size_t col_id) {
+    CHECK_LT(row_id, GetHeight()) << "Access: row_id out of bound";
+    CHECK_LT(col_id, GetWidth()) << "Access: col_id out of bound";
     return data_[row_id][col_id];
   }
 
   FeaType fea_type(size_t col_id) {
+    CHECK_LT(col_id, fea_types_.size()) << "Access: feature id out of bound";
     return fea_types_[col_id];
+  }
+
+  std::vector<FeaType> fea_type() {
+    return fea_types_;
   }
 
   void SetType(const std::vector<FeaType>& types) {
@@ -49,10 +61,13 @@ public:
   }
 
   void SetValue(size_t row_id, size_t col_id, const Value& value) {
+    CHECK_LT(row_id, GetHeight()) << "Set: row_id out of bound";
+    CHECK_LT(col_id, GetWidth()) << "Set: col_id out of bound";
     data_[row_id][col_id] = value;
   }
 
   void Copy(size_t row_id, const std::vector<Value>& values) {
+    CHECK_LT(row_id, GetHeight()) << "Copy: row_id out of bound";
     data_[row_id] = values;
   }
 
@@ -64,9 +79,9 @@ public:
     data_.push_back(values);
   }
 
-  void Add() {
+  void AddOneRow(size_t col_num) {
     std::vector<Value> values;
-    values.resize(MAX_NODE_SIZE);
+    values.resize(col_num);
     data_.push_back(values);
   }
 
@@ -75,20 +90,20 @@ public:
     if (type == FeaType::CONT) {
         std::sort(data_.begin() + low,
                   data_.begin() + high,
-                  [](const Value& a, const Value& b) {
-                      return a.v < b.v;
+                  [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
+                      return a[col_id].v < b[col_id].v;
                   });
       } else if (type == FeaType::DISC) {
         std::sort(data_.begin() + low,
                   data_.begin() + high,
-                  [](const Value& a, const Value& b) {
-                      return a.cls < b.cls;
+                  [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
+                      return a[col_id].cls < b[col_id].cls;
                   });
       } else if (type == FeaType::RANK) {
         std::sort(data_.begin() + low,
                   data_.begin() + high,
-                  [](const Value& a, const Value& b) {
-                      return a.level < b.level;
+                  [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
+                      return a[col_id].level < b[col_id].level;
                   });
       }
   }
@@ -98,8 +113,8 @@ public:
 
     std::sort(data_.begin() + low,
               data_.begin() + high,
-              [cls](const Value& a, const Value& b) {
-                  return (a.cls-cls)*(a.cls-cls) > (b.cls-cls)*(b.cls-cls);
+              [cls, col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
+                  return (a[col_id].cls-cls)*(a[col_id].cls-cls) > (b[col_id].cls-cls)*(b[col_id].cls-cls);
               });
     size_t value = data_[high-1][col_id].cls;
     for (size_t i = high-1; i >= low; --i) {
