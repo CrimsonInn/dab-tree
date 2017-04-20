@@ -76,17 +76,25 @@ public:
     return split_value_.fea_type(fea_id);
   }
 
+  MatrixPtr GetSplitFea() {
+    MatrixPtr sfptr = std::make_shared<Matrix>(split_fea_);
+    return sfptr;
+  }
+
+  MatrixPtr GetSplitValue() {
+    MatrixPtr svptr = std::make_shared<Matrix>(split_value_);
+    return svptr;
+  }
+
   void Print();
-  void GrowNode(MatrixPtr batch_ptr, node cur_node);
   void TrainOneTree(MatrixPtr batch_ptr, float w);
 private:
   Matrix split_fea_ = Matrix(MAX_NODE_SIZE, 0, FeaType::DISC);
   Matrix split_value_ = Matrix(MAX_NODE_SIZE, 0);
   void PrintOneTree(size_t tree_id, size_t start);
+  void GrowNode(MatrixPtr batch_ptr, node cur_node);
 };
 
-
 typedef std::shared_ptr<RegTree> RegTreePtr;
-
 
 #endif  // DABTREE_TREE_H_

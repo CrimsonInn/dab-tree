@@ -4,10 +4,23 @@
 #include <memory>
 #include <vector>
 #include <glog/logging.h>
-#include "data.h"
+// #include "data.h"
+
+enum FeaType {
+  CONT = 0,
+  DISC = 1,
+  RANK = 2
+};
+
+union Value {
+  float v; //type 0, continuous feature
+  size_t cls; // type 1, discrete feature
+  int level; //type 2, rank feature
+};
 
 class Matrix {
 public:
+  Matrix(){}
 
   Matrix(std::vector<std::vector<Value>>& d,
          std::vector<FeaType>& t) :

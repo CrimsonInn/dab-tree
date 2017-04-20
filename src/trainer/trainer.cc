@@ -10,4 +10,4 @@ public:
 
 private:
   RegTree tree;
-}
+};
