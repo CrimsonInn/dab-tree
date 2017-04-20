@@ -3,6 +3,52 @@
 import sys
 sys.path.append("./")
 from include import data_pb2
+import pandas as pd 
+import numpy as np 
+
+
+def load_raw_data(file_name):
+  data_ = pd.read_csv(file_name)
+
+  # clean null data
+  data_na = ['cd', 'hd', 'dbdistance', 'vccdistance']
+  data_filled = pd.DataFrame(data_)
+  data_filled[data_na] = data_filled[data_na].apply(lambda x:x.fillna(x.mean()))
+
+  # transform data
+  fea_types = ['DISC','DISC','DISC','DISC',
+               'RANK','CONT','CONT','DISC',
+               'DISC','CONT','CONT','CONT',
+               'CONT','CONT','CONT','CONT','RANK']
+  fea_types = np.array(fea_types)
+  data_filled['gender']=(data_filled.gender == 'M')*1
+  data_filled['voted']=(data_filled.voted == 'Y')*1
+  party_mapping = {
+    'D':0,
+    'G':1,
+    'L':2,
+    'O':3,
+    'R':4,
+    'U':5
+  }
+  data_filled['party'] = data_filled['party'].map(party_mapping)
+  race_mapping = {
+    'African-American':0,
+    'Caucasian':1,
+    'Central Asian':2,
+    'East Asian':3,
+    'Hispanic':4,
+    'Jewish':5,
+    'Middle Eastern':6,
+    'Native American':7,
+    'Pacific Islander':8,
+    'South Asian':9,
+    'Uncoded':10
+  }
+  data_filled['racename'] = data_filled['racename'].map(race_mapping)
+  data_matrix = data_filled.values
+  np.random.shuffle(data_matrix)
+  return fea_types, data_matrix[0:1000, :]
 
 
 def write(fea_types, value_matrix, file_name):
@@ -86,7 +132,13 @@ def read(file_name):
 def main():
   fea_types = ["CONT", "CONT", "DISC", "RANK"]
   value_matrix = [[0,1,0,2],[0,1,0,0],[0,0.4,0,0],[0,0.4,1,0]]
+
   file_name = "BATCH_DATA_FILE"
+  # data_file_name = "train.csv"
+  # print("begin")
+  # fea_types, value_matrix = load_raw_data(data_file_name)
+  print(fea_types.shape)
+  print(value_matrix.shape)
   write(fea_types, value_matrix, file_name)
 
 
