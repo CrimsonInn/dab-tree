@@ -3,10 +3,10 @@
 #include "mpi.h"
 #include "tree.h"
 #include "message_tree.h"
+#include "cluster.h"
 #include <cstring>
 
-#define DLLEXPORT extern "C"
-using namespace std;
+
 
 
 // this is only a test of python interface
@@ -17,8 +17,7 @@ DLLEXPORT int run(){
     return 1;
 }
 
-void Master(int round, int comm_sz, MPI_Datatype &MPI_TREE);
-void Worker(int round, int myrank, MPI_Datatype &MPI_TREE);
+
 
 DLLEXPORT int Dabtree(int round){
 	int myrank, comm_sz;
@@ -119,10 +118,6 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 		}
 		local_count=message_tree->id+1;
 	}
-}
-
-int main(){
-	Dabtree(2);
 }
 
 

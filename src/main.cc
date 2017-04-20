@@ -1,6 +1,7 @@
 #include <iostream>
 #include <glog/logging.h>
 #include "data.h"
+#include "cluster.h"
 //#include "proto_func.h"
 
 int main() {
@@ -16,6 +17,8 @@ int main() {
 //  batch_data->samples.push_back(sample);
 
 //  write_batch_data(batch_data, file_name);
+
+  Dabtree(2);
 
 
   return 0;

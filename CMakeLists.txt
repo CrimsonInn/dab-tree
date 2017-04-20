@@ -72,18 +72,26 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} libglog ${PROTOBUF_LIBRARY})
+
+if(USE_MPI)
+  find_package(MPI)
+  set(CMAKE_CXX_COMPILER mpicxx)
+  set(CMAKE_C_COMPILER mpicc)
+  include_directories(${MPI_CXX_INCLUDE_PATH})
+  add_executable(${PROJECT_NAME} src/cluster/cluster.cc ${SOURCES})
+  target_link_libraries(${PROJECT_NAME} libglog ${PROTOBUF_LIBRARY} ${MPI_CXX_LIBRARIES})
+else()
+  add_executable(${PROJECT_NAME} ${SOURCES})
+  target_link_libraries(${PROJECT_NAME} libglog ${PROTOBUF_LIBRARY})
+endif()
+
+
 
 #add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/protobuf/read_proto.cc src/protobuf/write_proto.cc)
 add_library (dabcore STATIC src/core/data.cc src/core/tree.cc)
 
-find_package(MPI)
-if(MPI_FOUND)
-	include_directories(${MPI_INCLUDE_PATH})
-	add_executable(cluster src/cluster/cluster.cc)
-	target_link_libraries(cluster ${MPI_LIBRARIES})
-endif()
+
+
 
 ADD_SUBDIRECTORY(tests)
 
