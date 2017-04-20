@@ -108,11 +108,15 @@ BatchPtr read_batch_data(const std::string& file_name) {
 
 
 void print_batch_data(BatchPtr batchptr) {
+
+  MatrixPtr matrixptr = batchptr->get_samples();
+  unsigned int width = matrixptr->GetWidth();
+  unsigned int height = matrixptr->GetHeight();
+  std::cout << "width: " << width << std::endl;
+  std::cout << "height: " << height << std::endl;
 	
 	std::cout << "Types:" << std::endl;
-	MatrixPtr matrixptr = batchptr->get_samples();
-	unsigned int width = matrixptr->GetWidth();
-	unsigned int height = matrixptr->GetHeight();
+	
 	
 	for (size_t i = 0; i < width; ++i) {
 		if (matrixptr->fea_type(i) == CONT) {
@@ -131,8 +135,8 @@ void print_batch_data(BatchPtr batchptr) {
 	
 	auto &matrix = (*matrixptr);
 	std::cout << "Values:" << std::endl;
-	for (size_t i = 0; i < width; ++i) {
-		for (size_t j = 0; j < height; ++j) {
+	for (size_t i = 0; i < 3; ++i) {
+		for (size_t j = 0; j < width; ++j) {
 			if (matrixptr->fea_type(j) == CONT){
 				std::cout << "v: " << matrix(i, j).v << " ";
 			} else if (matrixptr->fea_type(j) == DISC) {

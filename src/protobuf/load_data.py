@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append("./")
-from include import data_pb2
+import include.data_pb2 as data_pb2
 import pandas as pd 
 import numpy as np 
 
@@ -48,6 +48,7 @@ def load_raw_data(file_name):
   data_filled['racename'] = data_filled['racename'].map(race_mapping)
   data_matrix = data_filled.values
   np.random.shuffle(data_matrix)
+  data_matrix = np.array(data_matrix)
   return fea_types, data_matrix[0:1000, :]
 
 
@@ -83,15 +84,15 @@ def write(fea_types, value_matrix, file_name):
       batch_data.fea_types.append(data_pb2.DISC)
       print("Unknown feature type; leaving as default value.")
 
-  for i in range(width):
-    for j in range(height):
+  for i in range(height):
+    for j in range(width):
       new_data_value = batch_data.data.add()
       if fea_types[j] == "CONT":
-        new_data_value.v = value_matrix[i][j]
+        new_data_value.v = float(value_matrix[i][j])
       elif fea_types[j] == "DISC":
-        new_data_value.cls = value_matrix[i][j]
+        new_data_value.cls = int(value_matrix[i][j])
       elif fea_types[j] == "RANK":
-        new_data_value.level = value_matrix[i][j]
+        new_data_value.level = int(value_matrix[i][j])
       else:
         new_data_value.cls = value_matrix[i][j]
         print("Unknown feature type; leaving as default value.")
@@ -130,13 +131,13 @@ def read(file_name):
 
 
 def main():
-  fea_types = ["CONT", "CONT", "DISC", "RANK"]
-  value_matrix = [[0,1,0,2],[0,1,0,0],[0,0.4,0,0],[0,0.4,1,0]]
+  # fea_types = ["CONT", "CONT", "DISC", "RANK"]
+  # value_matrix = [[0,1,0,2],[0,1,0,0],[0,0.4,0,0],[0,0.4,1,0]]
 
   file_name = "BATCH_DATA_FILE"
-  # data_file_name = "train.csv"
-  # print("begin")
-  # fea_types, value_matrix = load_raw_data(data_file_name)
+  data_file_name = "train.csv"
+  print("begin")
+  fea_types, value_matrix = load_raw_data(data_file_name)
   print(fea_types.shape)
   print(value_matrix.shape)
   write(fea_types, value_matrix, file_name)
