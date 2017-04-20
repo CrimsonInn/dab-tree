@@ -20,4 +20,6 @@ bool write_matrix_data(MatrixPtr matrixptr, dabtree::Matrix write_matrix);
 MatrixPtr read_matrix(const std::string& file_name);
 bool write_matrix(MatrixPtr matrix_data, const std::string& file_name);
 
+void print_batch_data(BatchPtr batchptr);
+
 #endif 
