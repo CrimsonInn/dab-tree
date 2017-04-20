@@ -62,6 +62,7 @@ include_directories(dabtree ${PROJECT_SOURCE_DIR}/include)
 file(GLOB SOURCES
     src/*.cc
     src/core/*.cc
+    src/trainer/*.cc
     include/*.h
     data/*.proto
 )
