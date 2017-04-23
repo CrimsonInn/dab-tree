@@ -56,6 +56,11 @@ public:
     return fea_types_[col_id];
   }
 
+  std::vector<FeaType> fea_types() {
+    return fea_types_;
+  }
+
+
   std::vector<FeaType> fea_type() {
     return fea_types_;
   }

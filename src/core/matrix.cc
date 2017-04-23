@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "matrix.h"
 #include <glog/logging.h>
 
