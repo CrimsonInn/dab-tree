@@ -4,7 +4,7 @@
 #include "proto_func.h"
 #include <glog/logging.h>
 
-
+/*
 BatchPtr read_batch_data(const std::string& file_name) {
 
   // Verify that the version of the protobuf that we linked against is
@@ -52,6 +52,9 @@ BatchPtr read_batch_data(const std::string& file_name) {
   return batchptr;
 
 }
+*/
+
+
 
 // RegTreePtr read_tree(const std::string& file_name) {
 
@@ -107,6 +110,7 @@ BatchPtr read_batch_data(const std::string& file_name) {
 // }
 
 
+/*
 void print_batch_data(BatchPtr batchptr) {
 
   MatrixPtr matrixptr = batchptr->get_samples();
@@ -152,6 +156,7 @@ void print_batch_data(BatchPtr batchptr) {
 	}
 	return ;
 }
+*/
 
 // void print_tree(RegTreePtr tree) {
 

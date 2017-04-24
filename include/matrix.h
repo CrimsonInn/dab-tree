@@ -45,6 +45,10 @@ public:
     return data_.size();
   }
 
+  void resize(size_t size) {
+    data_.resize(size);
+  }
+
   Value operator() (size_t row_id, size_t col_id) {
     CHECK_LT(row_id, GetHeight()) << "Access: row_id out of bound";
     CHECK_LT(col_id, GetWidth()) << "Access: col_id out of bound";
@@ -61,8 +65,8 @@ public:
   }
 
 
-  std::vector<FeaType> fea_type() {
-    return fea_types_;
+  std::vector<Value> data(size_t row_id) {
+    return data_[row_id];
   }
 
   void SetType(const std::vector<FeaType>& types) {

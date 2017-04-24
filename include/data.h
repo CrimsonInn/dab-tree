@@ -4,30 +4,17 @@
 #include <iostream>
 #include <vector>
 #include <memory>
+#include <fstream>
+#include <string>
 #include "matrix.h"
+#include "data.pb.h"
+#include "matrix.pb.h"
 
-// enum FeaType {
-//   CONT = 0,
-//   DISC = 1,
-//   RANK = 2
-// };
-
-// union Value {
-//   float v; //type 0, continuous feature
-//   size_t cls; // type 1, discrete feature
-//   int level; //type 2, rank feature
-// };
-
-// struct Batch {
-//   std::vector<FeaType> fea_types;
-//   std::vector<std::vector<Value>> samples;
-// };
-
-// typedef std::shared_ptr<Batch> BatchPtr;
-
-
-class Batch {
+class DataProvider {
 public:
+
+  DataProvider(){ row_index = 0; }
+  DataProvider(const std::string &file_name);
 
   size_t num_samples() {
     return samples_.GetHeight();
@@ -61,10 +48,14 @@ public:
     return samptr;
   }
 
+  void get_next_batch(MatrixPtr batch_ptr, size_t batch_size);
+
+  void print_samples(size_t row_num);
+
 private:
+  int row_index;
   Matrix samples_ = Matrix();
 };
 
-typedef std::shared_ptr<Batch> BatchPtr;
 
 #endif  // DABTREE_DATA_H_
