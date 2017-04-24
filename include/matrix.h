@@ -63,7 +63,9 @@ public:
     return data_[row_id];
   }
 
-
+  void AddZero(){
+    data_.push_back(std::vector<Value>(MAX_NODE_SIZE, {.v=0.0}));
+  }
   void Add(const std::vector<Value>& values) {
     data_.push_back(values);
   }

@@ -11,7 +11,7 @@
 #define DLLEXPORT extern "C"
 using namespace std;
 
-void Master(int round, int comm_sz, MPI_Datatype &MPI_TREE);
+EnsembleMessageTreePtr Master(int round, int comm_sz, MPI_Datatype &MPI_TREE);
 
 void Worker(int round, int myrank, MPI_Datatype &MPI_TREE);
 

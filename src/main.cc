@@ -4,7 +4,7 @@
 #include "cluster.h"
 //#include "proto_func.h"
 
-int main() {
+int main(int argv, char * args[]) {
 
 //  std::string file_name = "BATCH_DATA_FILE";
 //  BatchPtr batch_data = std::make_shared<Batch>();;
@@ -17,8 +17,8 @@ int main() {
 //  batch_data->samples.push_back(sample);
 
 //  write_batch_data(batch_data, file_name);
-
-  Dabtree(2);
+  cout << args[1][0] << "\n";
+  Dabtree(args[1][0]-'0');
 
 
   return 0;

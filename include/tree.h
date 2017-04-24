@@ -62,7 +62,16 @@ public:
     weight.push_back(1.0);
   }
 
-  void AddRandom(){
+  void Fill(int numTree){
+    for (int i = this->NumTrees(); i<numTree; i++){
+      split_fea_.AddZero();
+      split_value_.AddZero();
+      weight.push_back(1);
+    }
+  }
+
+  void InitRandom(int id){
+    this->Fill(id+1);
     srand(time(NULL));
     std::vector<Value> fea(MAX_NODE_SIZE, {.v=0.0});
     std::vector<Value> value(MAX_NODE_SIZE, {.v=0.0});
@@ -70,9 +79,9 @@ public:
       fea[i].v=std::rand();
       value[i].v=std::rand();
     }
-    split_fea_.Add(fea);
-    split_value_.Add(value);
-    weight.push_back(1.0);
+    split_fea_.Copy(id,fea);
+    split_value_.Copy(id,value);
+    weight[id]=1.0;
   }
 
   void SetType(const std::vector<FeaType>& types) {
@@ -91,7 +100,7 @@ public:
   }
 
   void Print(size_t id){
-      std::cout << "printing message tree ---------------- \n";
+      std::cout << "printing reg tree ---------------- \n";
       std::cout << "id: " << id << "\n";
       std::cout << "weight: " << weight[id] << "\n";
       std::cout << "feas: ";
@@ -103,6 +112,7 @@ public:
   }
 
   void Copy(MessageTreePtr tree_ptr) {
+    this->Fill(tree_ptr->id+1);
     split_fea_.Copy(tree_ptr->id, *(new std::vector<Value>( std::begin(tree_ptr->feas), std::end(tree_ptr->feas))));
     split_value_.Copy(tree_ptr->id, *(new std::vector<Value>( std::begin(tree_ptr->values), std::end(tree_ptr->values))));
     weight[tree_ptr->id] = tree_ptr->weight;
