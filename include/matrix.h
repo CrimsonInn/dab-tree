@@ -48,8 +48,8 @@ public:
   void resize(size_t height, size_t width) {
     
     // for (size_t i = 0; i < height; ++i) {
-    // std::vector<Value> values;
-    // values.resize(width);
+    //   std::vector<Value> values;
+    //   values.resize(width);
     //   data_.push_back(values);
     // }
 

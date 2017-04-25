@@ -27,7 +27,7 @@ public:
   FeaType get_fea_type(size_t index) {
     return samples_.fea_type(index);
   }
-  
+
   std::vector<FeaType> get_fea_types() {
     return samples_.fea_types();
   }
@@ -49,7 +49,7 @@ public:
     return samptr;
   }
 
-  void get_next_batch(MatrixPtr batch_ptr, size_t batch_size, size_t width);
+  void get_next_batch(MatrixPtr batch_ptr, size_t batch_size);
 
   void print_samples(size_t row_num);
 

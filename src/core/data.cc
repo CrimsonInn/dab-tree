@@ -89,11 +89,11 @@ void DataProvider::print_samples(size_t row_num) {
   return ;
 }
 
-
-void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size, size_t width) {
-  batch_ptr = std::make_shared<Matrix>();
+void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size) {
+  size_t width = samples_.GetWidth();
+  // batch_ptr = std::make_shared<Matrix>();
   batch_ptr->resize(batch_size, width);
-  batch_ptr->SetType(get_fea_types());
+  batch_ptr->SetType(samples_.fea_types());
   int height = samples_.GetHeight();
   size_t i = 0;
   for (i = 0; i < batch_size; ++i) {

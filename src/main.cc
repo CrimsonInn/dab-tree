@@ -21,7 +21,7 @@ int main() {
   MatrixPtr test_matrix_ptr = std::make_shared<Matrix>();
   unsigned int width = data_provider.num_feas();
   // std::cout << width << std::endl;
-  data_provider.get_next_batch(test_matrix_ptr, 3, width);
+  data_provider.get_next_batch(test_matrix_ptr, 3);
 
   // std::cout << test_matrix_ptr->GetHeight() << std::endl;
   // std::cout << test_matrix_ptr->GetWidth() << std::endl;
