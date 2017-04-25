@@ -1,6 +1,6 @@
 #ifndef DABTREE_MATRIX_H_
 #define DABTREE_MATRIX_H_
-
+#include <iostream>
 #include <memory>
 #include <vector>
 #include <glog/logging.h>
@@ -45,8 +45,15 @@ public:
     return data_.size();
   }
 
-  void resize(size_t size) {
-    data_.resize(size);
+  void resize(size_t height, size_t width) {
+    
+    // for (size_t i = 0; i < height; ++i) {
+    // std::vector<Value> values;
+    // values.resize(width);
+    //   data_.push_back(values);
+    // }
+
+    data_.resize(height, std::vector<Value>(width));
   }
 
   Value operator() (size_t row_id, size_t col_id) {
@@ -82,6 +89,7 @@ public:
   void Copy(size_t row_id, const std::vector<Value>& values) {
     CHECK_LT(row_id, GetHeight()) << "Copy: row_id out of bound";
     data_[row_id] = values;
+    // std::cout << "Copy: " << data_[row_id].size() << std::endl;
   }
 
   void Copy(const std::vector<std::vector<Value>>& values) {
@@ -102,6 +110,7 @@ public:
   size_t Split(size_t col_id, size_t low, size_t high, size_t cls);
   float ColMean(size_t col_id, size_t low, size_t high);
   float SSE(size_t low, size_t high);
+  void Print(size_t row_num);
 
 private:
   std::vector<std::vector<Value>> data_;

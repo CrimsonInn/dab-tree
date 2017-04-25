@@ -18,5 +18,19 @@ int main() {
 	DataProvider data_provider = DataProvider(file_name);
 	data_provider.print_samples(3);
 
+  MatrixPtr test_matrix_ptr = std::make_shared<Matrix>();
+  unsigned int width = data_provider.num_feas();
+  // std::cout << width << std::endl;
+  data_provider.get_next_batch(test_matrix_ptr, 3, width);
+
+  // std::cout << test_matrix_ptr->GetHeight() << std::endl;
+  // std::cout << test_matrix_ptr->GetWidth() << std::endl;
+  // for (size_t i = 0; i < test_matrix_ptr->GetWidth(); ++i) {
+  //   std::cout << test_matrix_ptr->fea_type(i) << " ";
+  // }
+  // std::cout << std::endl;
+
+  test_matrix_ptr->Print(2);
+
   return 0;
 }

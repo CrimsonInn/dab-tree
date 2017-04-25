@@ -90,9 +90,10 @@ void DataProvider::print_samples(size_t row_num) {
 }
 
 
-void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size) {
-  batch_ptr->resize(batch_size);
+void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size, size_t width) {
+  batch_ptr->resize(batch_size, width);
   int height = samples_.GetHeight();
+  batch_ptr->SetType(samples_.fea_types());
   size_t i = 0;
   for (i = 0; i < batch_size; ++i) {
     batch_ptr->Copy(i, samples_.data((i + row_index) % height));
