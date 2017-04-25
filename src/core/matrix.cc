@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "matrix.h"
+#include <iostream>
 #include <glog/logging.h>
 
 
@@ -101,6 +102,46 @@ void Matrix::Print(size_t row_num) {
 
   std::cout << "Values:" << std::endl;
   for (size_t i = 0; i < row_num; ++i) {
+    for (size_t j = 0; j < width; ++j) {
+      if (fea_type(j) == CONT){
+        std::cout << "v: " << data_[i][j].v << " ";
+      } else if (fea_type(j) == DISC) {
+        std::cout << "cls: " << data_[i][j].cls << " ";
+      } else if (fea_type(j) == RANK) {
+        std::cout << "level: " << data_[i][j].level << " ";
+      } else {
+        LOG(ERROR) << "Data type error.";
+        return ;
+      }
+    }
+    std::cout << std::endl;
+  }
+  return ;
+}
+
+void Matrix::Print() {
+  unsigned int width = GetWidth();
+  unsigned int height = GetHeight();
+  std::cout << "width: " << width << std::endl;
+  std::cout << "height: " << height << std::endl;
+
+  std::cout << "Types:" << std::endl;
+  for (size_t i = 0; i < width; ++i) {
+    if (fea_type(i) == CONT) {
+      std::cout << "CONT" << " ";
+    } else if (fea_type(i) == DISC) {
+      std::cout << "DISC" << " ";
+    } else if (fea_type(i) == RANK) {
+      std::cout << "RANK" << " ";
+    } else {
+      LOG(ERROR) << "Data type error.";
+      return ;
+    }
+  }
+  std::cout << std::endl;
+
+  std::cout << "Values:" << std::endl;
+  for (size_t i = 0; i < height; ++i) {
     for (size_t j = 0; j < width; ++j) {
       if (fea_type(j) == CONT){
         std::cout << "v: " << data_[i][j].v << " ";

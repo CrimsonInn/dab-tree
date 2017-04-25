@@ -1,17 +1,20 @@
 #include "tree.h"
 #include <glog/logging.h>
 
-const size_t MIN_SAMPLENUM_SPLIT = 2;
+const size_t MIN_SAMPLENUM_SPLIT = 10;
 
 
 bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
   size_t sample_num = batch_ptr->GetHeight();
   if (sample_num == 0)
     return true;
-  if (result_ptr->empty()) {
-      result_ptr->resize(sample_num, 0.0);
-    }
-  CHECK_EQ(sample_num, result_ptr->size()) << "Result size is different from sample size";
+  result_ptr->resize(sample_num, 0.0);
+
+  if (NumTrees() == 0) {
+      std::fill(result_ptr->begin(), result_ptr->end(), 0.0);
+      return true;
+  }
+
   auto& batch = *batch_ptr;
   auto& result = *result_ptr;
   for (size_t i = 0; i < sample_num; ++i) {
@@ -164,7 +167,7 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
 
 void RegTree::TrainOneTree(MatrixPtr batch_ptr, float w) {
   if (split_value_.Empty()) {
-      split_value_.SetType(batch_ptr->fea_type());
+      split_value_.SetType(batch_ptr->fea_types());
     } else {
       for (size_t i = 0; i < batch_ptr->GetWidth(); ++i) {
         CHECK_EQ(batch_ptr->fea_type(i), split_type(i));

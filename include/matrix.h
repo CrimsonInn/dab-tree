@@ -80,6 +80,10 @@ public:
     fea_types_ = types;
   }
 
+  void SetType(size_t fea_id, FeaType type) {
+    fea_types_[fea_id] = type;
+  }
+
   void SetValue(size_t row_id, size_t col_id, const Value& value) {
     CHECK_LT(row_id, GetHeight()) << "Set: row_id out of bound";
     CHECK_LT(col_id, GetWidth()) << "Set: col_id out of bound";
@@ -111,6 +115,7 @@ public:
   float ColMean(size_t col_id, size_t low, size_t high);
   float SSE(size_t low, size_t high);
   void Print(size_t row_num);
+  void Print();
 
 private:
   std::vector<std::vector<Value>> data_;

@@ -7,4 +7,7 @@ target_link_libraries(test_tree
     libglog
     libgtest
     libgmock
+    libglog
+    proto
+    ${PROTOBUF_LIBRARY}
 )

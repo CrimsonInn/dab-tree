@@ -3,27 +3,15 @@
 #include <memory>
 #include "data.h"
 #include "tree.h"
+#include "trainer.h"
 
 TEST(TreeTest, TrainOneBatch) {
-  RegTreePtr tree = std::make_shared<RegTree>();
-  tree->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
+  Trainer trainer("BATCH_DATA_FILE");
+  for (size_t i = 0; i < 5; ++i) {
+      trainer.TrainOneBatch();
+      trainer.tree.Print();
+    }
 
-  MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));
-  batch->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
-  batch->Copy(0, {{.v=0.1}, {.v=1}, {.cls=0}, {.level=2}});
-  batch->Copy(1, {{.v=0.2}, {.v=1}, {.cls=0}, {.level=0}});
-  batch->Copy(2, {{.v=0.3}, {.v=0.4}, {.cls=0}, {.level=0}});
-  batch->Copy(3, {{.v=0.4}, {.v=0.4}, {.cls=1}, {.level=0}});
-
-  tree->TrainOneTree(batch, 1.0);
-  tree->Print();
-
-//  VectorPtr result = std::make_shared<std::vector<float>>();
-//  tree->Predict(batch, result);
-//  ASSERT_FLOAT_EQ(0.7, (*result)[0]);
-//  ASSERT_FLOAT_EQ(0.6, (*result)[1]);
-//  ASSERT_FLOAT_EQ(0.5, (*result)[2]);
-//  ASSERT_FLOAT_EQ(0.4, (*result)[3]);
 }
 
 
