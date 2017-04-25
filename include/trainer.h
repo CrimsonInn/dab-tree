@@ -13,29 +13,36 @@ public:
     dp = DataProvider(proto_name);
     tree = RegTree();
     tree.SetType(dp.get_fea_types());
-    batch_size = 256;
-    step_size = 0.1;
+    batch_size = 1000;
+    step_size = 1;
   }
 
   void TrainOneBatch() {
     dp.get_next_batch(batch_ptr, batch_size);
-    batch_ptr->Print();
-    VectorPtr result;
-    tree.Predict(batch_ptr, result);
+//    batch_ptr->Print();
+    VectorPtr result_ptr = std::make_shared<std::vector<float>>();
+    tree.Predict(batch_ptr, result_ptr);
+
+    float loss = 0.0;
     for (size_t i = 0; i < batch_ptr->GetHeight(); ++i) {
       int y = 1;
       if ((*batch_ptr)(i, 0).cls == 0) y = -1;
-      if ((*result)[i] * y > 1.0)
+      if ((*result_ptr)[i] * y > 1.0) {
         batch_ptr->SetValue(i, 0, {.v = 0});
-      else
+      }
+      else {
+        loss += 1.0 - (*result_ptr)[i]*y;
         batch_ptr->SetValue(i, 0, {.v = 1});
       }
-  tree.TrainOneTree(batch_ptr, step_size);
+    }
+    LOG(INFO) << "Loss:" << loss/batch_ptr->GetHeight();
+    batch_ptr->SetType(0, FeaType::CONT);
+    tree.TrainOneTree(batch_ptr, step_size);
 }
 
 private:
   DataProvider dp;
-  MatrixPtr batch_ptr;
+  MatrixPtr batch_ptr = std::make_shared<Matrix>();
   size_t batch_size;
   float step_size;
 };

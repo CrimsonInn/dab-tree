@@ -97,7 +97,7 @@ void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size) {
   int height = samples_.GetHeight();
   size_t i = 0;
   for (i = 0; i < batch_size; ++i) {
-    batch_ptr->AddOneRow(num_feas());
+//    batch_ptr->AddOneRow(num_feas());
     batch_ptr->Copy(i, samples_.data((i + row_index) % height));
   }
   row_index = (i + row_index) % height; 
