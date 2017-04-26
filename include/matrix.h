@@ -120,6 +120,7 @@ public:
 private:
   std::vector<std::vector<Value>> data_;
   std::vector<FeaType> fea_types_;
+  void BestSplitDISC(size_t col_id, size_t low, size_t high);
 };
 
 typedef std::shared_ptr<Matrix> MatrixPtr;
