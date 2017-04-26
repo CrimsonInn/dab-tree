@@ -9,9 +9,8 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
   if (sample_num == 0)
     return true;
   result_ptr->resize(sample_num, 0.0);
-
+  std::fill(result_ptr->begin(), result_ptr->end(), 0.0);
   if (NumTrees() == 0) {
-      std::fill(result_ptr->begin(), result_ptr->end(), 0.0);
       return true;
   }
 
@@ -23,7 +22,8 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
           while (true) {
               CHECK_LT(cur_node, MAX_NODE_SIZE) << "Node is out of bound";
               if (split_fea(j, cur_node) == 0) {
-                  result[i] += weight[j] * split_value(j, cur_node).v;
+                  (*result_ptr)[i] += weight[j] * split_value(j, cur_node).v;
+//                  std::cout << i << " " << j << " " << cur_node << " " << split_value(j, cur_node).v << std::endl;
                   break;
                 }
               size_t cur_fea = split_fea(j, cur_node);
@@ -33,7 +33,7 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
               cur_node = cur_node*2;
               if (cur_type == FeaType::CONT && batch(i, cur_fea).v >= cur_value.v) {
                   cur_node += 1;
-                } else if (cur_type == FeaType::DISC && batch(i, cur_fea).cls != cur_value.cls) {
+                } else if (cur_type == FeaType::DISC && batch(i, cur_fea).cls == cur_value.cls) {
                   cur_node += 1;
                 } else if (cur_type == FeaType::RANK && batch(i, cur_fea).level >= cur_value.level) {
                   cur_node += 1;
@@ -41,6 +41,7 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
             }
         }
     }
+//  for (size_t i = 0; i < result_ptr->size(); ++i) std::cout << (*result_ptr)[i] << " ";
   return true;
 }
 

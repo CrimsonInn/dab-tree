@@ -4,6 +4,7 @@
 #include "proto_func.h"
 #include <iostream>
 #include <string>
+#include <cmath>
 
 class Trainer {
 public:
@@ -13,35 +14,39 @@ public:
     dp = DataProvider(proto_name);
     tree = RegTree();
     tree.SetType(dp.get_fea_types());
-    batch_size = 512;
-    step_size = 0.01;
+    batch_size = 1000;
+    step_size = 1;
   }
 
   void TrainOneBatch() {
     dp.get_next_batch(batch_ptr, batch_size);
-//    batch_ptr->Print();
     VectorPtr result_ptr = std::make_shared<std::vector<float>>();
+    batch_ptr->SetType(0, FeaType::DISC);
     tree.Predict(batch_ptr, result_ptr);
 
     float loss = 0.0;
     float err = 0;
     for (size_t i = 0; i < batch_ptr->GetHeight(); ++i) {
-      int y = 1;
-      if ((*batch_ptr)(i, 0).cls == 0) y = -1;
-      if ((*result_ptr)[i] * y > 1.0) {
-        batch_ptr->SetValue(i, 0, {.v = 0});
-      }
-      else {
-        loss += 1.0 - (*result_ptr)[i]*y;
-        batch_ptr->SetValue(i, 0, {.v = 1});
-      }
+//      int y = 1;
+      float y = (*batch_ptr)(i, 0).cls == 0? -1 : 1;
+      float margin = (*result_ptr)[i] * y;
 
-      if ((*result_ptr)[i] * y < 0)
+//      float tmp = margin < 1? 1-margin: 0;
+      float tmp = std::exp(-margin);
+      loss += tmp;
+//      if (margin < 1) batch_ptr->SetValue(i, 0, {.v = y});
+//      else
+//        batch_ptr->SetValue(i, 0, {.v = 0.0});
+      batch_ptr->SetValue(i, 0, {.v = y*tmp});
+
+      if (margin < 0)
         err += 1;
     }
     LOG(INFO) << "Loss=" << loss/batch_ptr->GetHeight() << ", err rate=" << err/batch_ptr->GetHeight();
     batch_ptr->SetType(0, FeaType::CONT);
+//    batch_ptr->Print();
     tree.TrainOneTree(batch_ptr, step_size);
+    step_size /= 1.0;
 }
 
 private:

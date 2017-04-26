@@ -7,7 +7,7 @@
 
 TEST(TreeTest, TrainOneBatch) {
   Trainer trainer("BATCH_DATA_FILE");
-  for (size_t i = 0; i < 10; ++i) {
+  for (size_t i = 0; i < 20; ++i) {
       trainer.TrainOneBatch();
     }
   trainer.tree.Print();
@@ -37,7 +37,7 @@ TEST(TreeTest, OneTreePredict) {
   tree->Predict(batch, result);
   ASSERT_FLOAT_EQ(0.7, (*result)[0]);
   ASSERT_FLOAT_EQ(0.6, (*result)[1]);
-  ASSERT_FLOAT_EQ(0.5, (*result)[2]);
+  ASSERT_FLOAT_EQ(0.75, (*result)[2]);
   ASSERT_FLOAT_EQ(0.4, (*result)[3]);
 }
 
