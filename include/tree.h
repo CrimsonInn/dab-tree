@@ -5,6 +5,7 @@
 #include <memory>
 #include "data.h"
 #include "matrix.h"
+#include "ThreadPool.h"
 
 const size_t MAX_NODE_SIZE = 64;
 

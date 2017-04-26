@@ -1,8 +1,7 @@
 #include "tree.h"
 #include <glog/logging.h>
-
+#include "ThreadPool.h"
 const size_t MIN_SAMPLENUM_SPLIT = 2;
-
 
 bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
   size_t sample_num = batch_ptr->GetHeight();
@@ -16,7 +15,11 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
 
   auto& batch = *batch_ptr;
   auto& result = *result_ptr;
+
+  ThreadPool pool_(12);
+
   for (size_t i = 0; i < sample_num; ++i) {
+      pool_.enqueue([&, this, i]() {
       for (size_t j = 0; j < NumTrees(); ++j) {
           size_t cur_node = 1;
           while (true) {
@@ -40,6 +43,7 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
                 }
             }
         }
+      });
     }
 //  for (size_t i = 0; i < result_ptr->size(); ++i) std::cout << (*result_ptr)[i] << " ";
   return true;
@@ -161,8 +165,14 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
     }
   node left = {.row_id=cur_node.row_id, .col_id=cur_node.col_id*2, .low = cur_node.low, .high=mid};
   node right = {.row_id=cur_node.row_id, .col_id=cur_node.col_id*2+1, .low = mid, .high=cur_node.high};
+//  ThreadPool pool_(2);
+
+//  pool_.enqueue([&]() {
   GrowNode(batch_ptr, left);
+//    });
+//  pool_.enqueue([&]() {
   GrowNode(batch_ptr, right);
+//    });
   return;
 }
 

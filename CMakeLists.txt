@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_C_COMPILER "gcc")
 set(CMAKE_CXX_COMPILER "g++")
 
+if(USE_OPENMP)
+FIND_PACKAGE( OpenMP REQUIRED)
+message("USE OPENMP")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 project(dabtree)
 # Enable ExternalProject CMake module
 include(ExternalProject)
