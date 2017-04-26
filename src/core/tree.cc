@@ -1,7 +1,7 @@
 #include "tree.h"
 #include <glog/logging.h>
 
-const size_t MIN_SAMPLENUM_SPLIT = 10;
+const size_t MIN_SAMPLENUM_SPLIT = 2;
 
 
 bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
@@ -165,7 +165,7 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
   return;
 }
 
-void RegTree::TrainOneTree(MatrixPtr batch_ptr, float w) {
+void RegTree::TrainOneTree(MatrixPtr batch_ptr, float weight) {
   if (split_value_.Empty()) {
       split_value_.SetType(batch_ptr->fea_types());
     } else {
@@ -173,7 +173,7 @@ void RegTree::TrainOneTree(MatrixPtr batch_ptr, float w) {
         CHECK_EQ(batch_ptr->fea_type(i), split_type(i));
         }
     }
-  AddOneTree();
+  AddOneTree(weight);
   size_t row_id = NumTrees()-1;
   node root = {.row_id=row_id, .col_id=1, .low = 0, .high=batch_ptr->GetHeight()};
   GrowNode(batch_ptr, root);

@@ -62,10 +62,10 @@ public:
     weight.push_back(w);
   }
 
-  void AddOneTree() {
+  void AddOneTree(float w=1.0) {
     split_fea_.AddOneRow(MAX_NODE_SIZE);
     split_value_.AddOneRow(MAX_NODE_SIZE);
-    weight.push_back(1.0);
+    weight.push_back(w);
   }
 
   void SetType(const std::vector<FeaType>& types) {

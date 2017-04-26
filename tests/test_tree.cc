@@ -11,8 +11,6 @@ TEST(TreeTest, TrainOneBatch) {
       trainer.TrainOneBatch();
     }
   trainer.tree.Print();
-
-
 }
 
 
@@ -26,7 +24,7 @@ TEST(TreeTest, OneTreePredict) {
                                {.v=0.4}, {.v=0.5}, {.v=0.6}, {.v=0.7}};
   values.resize(MAX_NODE_SIZE, {.v=0.0});
   tree->AddOneTree(feas, values);
-  tree->Print();
+//  tree->Print();
 
   MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));
   batch->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
@@ -54,7 +52,7 @@ TEST(TreeTest, EnsemblePredict) {
   values.resize(MAX_NODE_SIZE, {.v=0.0});
   tree->AddOneTree(feas, values);
   tree->AddOneTree(feas, values, 0.5);
-  tree->Print();
+//  tree->Print();
 
 
   MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));

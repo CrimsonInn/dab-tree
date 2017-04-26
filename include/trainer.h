@@ -13,8 +13,8 @@ public:
     dp = DataProvider(proto_name);
     tree = RegTree();
     tree.SetType(dp.get_fea_types());
-    batch_size = 1000;
-    step_size = 1;
+    batch_size = 512;
+    step_size = 0.01;
   }
 
   void TrainOneBatch() {
@@ -24,6 +24,7 @@ public:
     tree.Predict(batch_ptr, result_ptr);
 
     float loss = 0.0;
+    float err = 0;
     for (size_t i = 0; i < batch_ptr->GetHeight(); ++i) {
       int y = 1;
       if ((*batch_ptr)(i, 0).cls == 0) y = -1;
@@ -34,8 +35,11 @@ public:
         loss += 1.0 - (*result_ptr)[i]*y;
         batch_ptr->SetValue(i, 0, {.v = 1});
       }
+
+      if ((*result_ptr)[i] * y < 0)
+        err += 1;
     }
-    LOG(INFO) << "Loss:" << loss/batch_ptr->GetHeight();
+    LOG(INFO) << "Loss=" << loss/batch_ptr->GetHeight() << ", err rate=" << err/batch_ptr->GetHeight();
     batch_ptr->SetType(0, FeaType::CONT);
     tree.TrainOneTree(batch_ptr, step_size);
 }
