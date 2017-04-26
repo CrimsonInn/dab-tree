@@ -4,6 +4,7 @@
 #include "tree.h"
 #include "message_tree.h"
 #include "cluster.h"
+#include "trainer.h"
 #include <cstring>
 #include <glog/logging.h>
 
@@ -46,9 +47,9 @@ DLLEXPORT int Dabtree(int round){
 		MPI_Barrier(MPI_COMM_WORLD);
 		cout << "master print trees \n";
 
-		for(auto tr : *tree){
-			cout<<(tr->Print());
-		}
+		//for(auto tr : *tree){
+		//	cout<<(tr->Print());
+		//}
 		cout << "master success \n";
 	}
 	else{
@@ -108,14 +109,16 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 	int local_count=0;
 	MPI_Status stat;
 	RegTreePtr vec_tree(new RegTree);
+	Trainer trainer("BATCH_DATA_FILE");
 	for (int i=0; i<round;i++){
 		//call train local here
-		vec_tree->InitRandom(local_count);//TrainLocal();
+
+		trainer.TrainOneBatch();//TrainLocal();
 		cout<< "tree on worker "<< myrank << " is "<< vec_tree->NumTrees()<<" local_count is "<< local_count << "\n";
-		cout<<(vec_tree->Print(local_count));
+		//cout<<(trainer.tree.Print(local_count));
 
-		MessageTreePtr message_tree = vec_tree -> GetMessageTree(local_count);
-
+		//MessageTreePtr message_tree = vec_tree -> GetMessageTree(local_count);
+		MessageTreePtr message_tree = trainer.tree.GetMessageTree(local_count);
 		cout << "worker "<< myrank << " send tree "<< local_count << "\n";
 		message_tree ->id=local_count;
 		MPI_Ssend(message_tree.get(), 1, MPI_TREE, 0, 0, MPI_COMM_WORLD);
@@ -126,7 +129,8 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 		for (int j=0; j <receive_count; j++){
 			MPI_Recv(message_tree.get(), 1, MPI_TREE, 0,0,MPI_COMM_WORLD, &stat);
 			cout << "worker "<< myrank << " receive tree id "<< message_tree->id << ", " << local_count << "\n";
-			vec_tree->Copy(message_tree);
+			//vec_tree->Copy(message_tree);
+			trainer.tree.Copy(message_tree);
 			//vec_tree->Print(local_count);
 			cout << "worker "<< myrank << " pushed tree"<< "\n";
 			local_count=local_count+1;

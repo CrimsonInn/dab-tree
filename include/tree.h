@@ -13,6 +13,12 @@
 
 //const size_t MAX_NODE_SIZE = 64;
 
+struct node {
+  size_t row_id;
+  size_t col_id;
+  size_t low;
+  size_t high;
+};
 
 /* Regression Tree
  * 1-based indexing
@@ -21,9 +27,11 @@
 */
 class RegTree {
 public:
-  std::vector<float> weight = {1.0};
-  std::vector<size_t> id = {1};
+  std::vector<float> weight;
+  std::vector<size_t> id;
+
   bool Predict(MatrixPtr batch_ptr, VectorPtr result_ptr);
+  void TrainOneTree(MatrixPtr batch_ptr);
 
   size_t NumTrees() {
     return split_value_.GetHeight();
@@ -37,20 +45,21 @@ public:
     return split_value_(tree_id, node_id);
   }
 
-  FeaType split_type(size_t tree_id, size_t node_id) {
-    return split_value_.fea_type(node_id);
+  FeaType split_type(size_t fea_id) {
+    return split_value_.fea_type(fea_id);
   }
 
   void Copy(size_t row_id,
             const std::vector<Value>& feas,
             const std::vector<Value>& values,
             float w=1.0) {
+    CHECK_LT(row_id, NumTrees()) << "(Tree) Copy: row_id out of bound";
     split_fea_.Copy(row_id, feas);
     split_value_.Copy(row_id, values);
     weight[row_id] = w;
   }
 
-  void Add(const std::vector<Value>& feas,
+  void AddOneTree(const std::vector<Value>& feas,
            const std::vector<Value>& values,
            float w=1.0) {
     split_fea_.Add(feas);
@@ -88,11 +97,19 @@ public:
     split_fea_.Copy(id,fea);
     split_value_.Copy(id,value);
     weight[id]=1.0;
+}
+
+  void AddOneTree(float w=1.0) {
+    split_fea_.AddOneRow(MAX_NODE_SIZE);
+    split_value_.AddOneRow(MAX_NODE_SIZE);
+    weight.push_back(w);
+
   }
 
   void SetType(const std::vector<FeaType>& types) {
     split_value_.SetType(types);
   }
+
 
   MessageTreePtr GetMessageTree(size_t id){
     MessageTreePtr message_tree ( new MessageTree(
@@ -128,14 +145,31 @@ public:
   }
 
 
-private:
-  Matrix split_fea_ = Matrix(MAX_NODE_SIZE, 1, FeaType::DISC);
-  Matrix split_value_ = Matrix(MAX_NODE_SIZE, 1);
 
+  FeaType GetType(size_t fea_id) {
+    return split_value_.fea_type(fea_id);
+  }
+
+
+  MatrixPtr GetSplitFea() {
+    MatrixPtr sfptr = std::make_shared<Matrix>(split_fea_);
+    return sfptr;
+  }
+
+  MatrixPtr GetSplitValue() {
+    MatrixPtr svptr = std::make_shared<Matrix>(split_value_);
+    return svptr;
+  }
+
+  void Print();
+  void TrainOneTree(MatrixPtr batch_ptr, float w);
+private:
+  Matrix split_fea_ = Matrix(MAX_NODE_SIZE, 0, FeaType::DISC);
+  Matrix split_value_ = Matrix(MAX_NODE_SIZE, 0);
+  void PrintOneTree(size_t tree_id, size_t start);
+  void GrowNode(MatrixPtr batch_ptr, node cur_node);
 };
 
-
 typedef std::shared_ptr<RegTree> RegTreePtr;
-
 
 #endif  // DABTREE_TREE_H_

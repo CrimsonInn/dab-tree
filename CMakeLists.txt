@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
-set(CMAKE_C_COMPILER "gcc")
-set(CMAKE_CXX_COMPILER "g++")
+#set(CMAKE_C_COMPILER "gcc")
+#set(CMAKE_CXX_COMPILER "g++")
 
 project(dabtree)
 # Enable ExternalProject CMake module
@@ -56,12 +56,14 @@ find_package(Protobuf REQUIRED)
 
 
 include_directories(dabtree ${PROJECT_SOURCE_DIR}/include)
-#include_directories(dabtree ${CMAKE_CURRENT_BINARY_DIR}/data)
+include_directories(dabtree ${CMAKE_CURRENT_BINARY_DIR}/data)
 
 
 file(GLOB SOURCES
     src/*.cc
     src/core/*.cc
+    src/trainer/*.cc
+    src/protobuf/*.cc
     include/*.h
     src/cluster/*.cc
     data/*.proto
@@ -73,31 +75,28 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 
+
 if(USE_MPI)
   find_package(MPI)
   set(CMAKE_CXX_COMPILER mpicxx)
   set(CMAKE_C_COMPILER mpicc)
   include_directories(${MPI_CXX_INCLUDE_PATH})
   add_executable(${PROJECT_NAME} src/cluster/cluster.cc ${SOURCES})
-  target_link_libraries(${PROJECT_NAME} libglog ${PROTOBUF_LIBRARY} ${MPI_CXX_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} libglog proto ${PROTOBUF_LIBRARY} ${MPI_CXX_LIBRARIES})
 else()
   add_executable(${PROJECT_NAME} ${SOURCES})
-  target_link_libraries(${PROJECT_NAME} libglog ${PROTOBUF_LIBRARY})
+  target_link_libraries(${PROJECT_NAME} libglog proto ${PROTOBUF_LIBRARY})
 endif()
 
 
 
 #add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/protobuf/read_proto.cc src/protobuf/write_proto.cc)
-add_library (dabcore STATIC src/core/data.cc src/core/tree.cc)
+#add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/core/matrix.cc src/trainer/trainer.cc src/core/data.cc)
+add_library (dabcore STATIC ${SOURCES})
 
 
 
 
 ADD_SUBDIRECTORY(tests)
-
-#file(GLOB TEST_SRC_FILES tests/*.cc)
-#add_executable(test_tree ${TEST_SRC_FILES})
-
-
-#ADD_SUBDIRECTORY(data)
+ADD_SUBDIRECTORY(data)
 

@@ -3,6 +3,15 @@
 #include <memory>
 #include "data.h"
 #include "tree.h"
+#include "trainer.h"
+
+TEST(TreeTest, TrainOneBatch) {
+  Trainer trainer("BATCH_DATA_FILE");
+  for (size_t i = 0; i < 10; ++i) {
+      trainer.TrainOneBatch();
+    }
+  trainer.tree.Print();
+}
 
 
 TEST(TreeTest, OneTreePredict) {
@@ -14,7 +23,8 @@ TEST(TreeTest, OneTreePredict) {
                                {.v=0.5}, {.cls=1}, {.level=1},
                                {.v=0.4}, {.v=0.5}, {.v=0.6}, {.v=0.7}};
   values.resize(MAX_NODE_SIZE, {.v=0.0});
-  tree->Copy(0, feas, values);
+  tree->AddOneTree(feas, values);
+//  tree->Print();
 
   MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));
   batch->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
@@ -40,8 +50,9 @@ TEST(TreeTest, EnsemblePredict) {
                                {.v=0.5}, {.cls=1}, {.level=1},
                                {.v=0.4}, {.v=0.5}, {.v=0.6}, {.v=0.7}};
   values.resize(MAX_NODE_SIZE, {.v=0.0});
-  tree->Copy(0, feas, values);
-  tree->Add(feas, values, 0.5);
+  tree->AddOneTree(feas, values);
+  tree->AddOneTree(feas, values, 0.5);
+//  tree->Print();
 
 
   MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));

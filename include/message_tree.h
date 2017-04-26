@@ -2,13 +2,13 @@
 #define DABTREE_MESTREE_H_
 
 #include "tree.h"
-//#include "data.h"
+#include "matrix.h"
 #include <cstdint>
 #include <climits>
 #include <sstream>
 #include <string>
 
-const size_t MAX_NODE_SIZE = 4;
+
 
 #if SIZE_MAX == UCHAR_MAX
 #define my_MPI_SIZE_T MPI_UNSIGNED_CHAR
