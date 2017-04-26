@@ -5,6 +5,8 @@
 //#include "data.h"
 #include <cstdint>
 #include <climits>
+#include <sstream>
+#include <string>
 
 const size_t MAX_NODE_SIZE = 4;
 
@@ -36,16 +38,18 @@ public:
     memcpy(this->values,  &(values[0]), values.size() * sizeof(values[0]));
   }
 
-  void Print() {
-    std::cout << "printing message tree ---------------- \n";
-    std::cout << "id: " << id << "\n";
-    std::cout << "weight: " << weight << "\n";
-    std::cout << "feas: ";
-    for (int i=0; i< MAX_NODE_SIZE; i++){std::cout << feas[i].v<<", ";}
-    std::cout << "\n";
-    std::cout << "values: ";
-    for (int i=0; i< MAX_NODE_SIZE; i++){std::cout << values[i].v<<", ";}
-    std::cout << "\n done ---------------- \n \n";
+  std::string Print() {
+    std::ostringstream s;
+    s<< "printing message tree ---------------- \n";
+    s << "id: " << id << "\n";
+    s << "weight: " << weight << "\n";
+    s << "feas: ";
+    for (int i=0; i< MAX_NODE_SIZE; i++){s<< feas[i].v<<", ";}
+    s << "\n";
+    s << "values: ";
+    for (int i=0; i< MAX_NODE_SIZE; i++){s << values[i].v<<", ";}
+    s << "\n done ---------------- \n \n";
+    return s.str();
   }
 };
 

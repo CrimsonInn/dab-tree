@@ -3,11 +3,13 @@
 
 #include <vector>
 #include <memory>
-#include <cstdlib>
-#include <ctime>
+#include "random"
 #include "data.h"
 #include "message_tree.h"
 #include "matrix.h"
+#include <glog/logging.h>
+#include <sstream> 
+#include <string>
 
 //const size_t MAX_NODE_SIZE = 64;
 
@@ -72,12 +74,16 @@ public:
 
   void InitRandom(int id){
     this->Fill(id+1);
-    srand(time(NULL));
+    
+    std::random_device rd;
+    std::mt19937 e2(rd());
+    std::uniform_real_distribution<> dist(0, 10);
+
     std::vector<Value> fea(MAX_NODE_SIZE, {.v=0.0});
     std::vector<Value> value(MAX_NODE_SIZE, {.v=0.0});
     for (int i=0; i<MAX_NODE_SIZE; i++){
-      fea[i].v=std::rand();
-      value[i].v=std::rand();
+      fea[i].v=dist(e2);
+      value[i].v=dist(e2);
     }
     split_fea_.Copy(id,fea);
     split_value_.Copy(id,value);
@@ -99,16 +105,19 @@ public:
     return message_tree;
   }
 
-  void Print(size_t id){
-      std::cout << "printing reg tree ---------------- \n";
-      std::cout << "id: " << id << "\n";
-      std::cout << "weight: " << weight[id] << "\n";
-      std::cout << "feas: ";
-      for (int i=0; i<MAX_NODE_SIZE; i++){std::cout << split_fea_.Get(id)[i].v<<", ";}
-      std::cout << "\n";
-      std::cout << "values: ";
-      for (int i=0; i<MAX_NODE_SIZE; i++){std::cout << split_value_.Get(id)[i].v<<", ";}
-      std::cout << "\n done ---------------- \n \n";
+  std::string Print(size_t id){
+      std::ostringstream s;
+
+      s << "printing reg tree ---------------- \n";
+      s << "id: " << id << "\n";
+      s << "weight: " << weight[id] << "\n";
+      s << "feas: ";
+      for (int i=0; i<MAX_NODE_SIZE; i++){s << split_fea_.Get(id)[i].v<<", ";}
+      s << "\n";
+      s << "values: ";
+      for (int i=0; i<MAX_NODE_SIZE; i++){s << split_value_.Get(id)[i].v<<", ";}
+      s<< "\n done ---------------- \n \n";
+      return s.str();
   }
 
   void Copy(MessageTreePtr tree_ptr) {

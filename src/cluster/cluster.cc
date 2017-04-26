@@ -5,7 +5,7 @@
 #include "message_tree.h"
 #include "cluster.h"
 #include <cstring>
-
+#include <glog/logging.h>
 
 
 
@@ -47,7 +47,7 @@ DLLEXPORT int Dabtree(int round){
 		cout << "master print trees \n";
 
 		for(auto tr : *tree){
-			tr->Print();
+			cout<<(tr->Print());
 		}
 		cout << "master success \n";
 	}
@@ -112,7 +112,7 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 		//call train local here
 		vec_tree->InitRandom(local_count);//TrainLocal();
 		cout<< "tree on worker "<< myrank << " is "<< vec_tree->NumTrees()<<" local_count is "<< local_count << "\n";
-		vec_tree->Print(local_count);
+		cout<<(vec_tree->Print(local_count));
 
 		MessageTreePtr message_tree = vec_tree -> GetMessageTree(local_count);
 
@@ -126,8 +126,8 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 		for (int j=0; j <receive_count; j++){
 			MPI_Recv(message_tree.get(), 1, MPI_TREE, 0,0,MPI_COMM_WORLD, &stat);
 			cout << "worker "<< myrank << " receive tree id "<< message_tree->id << ", " << local_count << "\n";
-			message_tree->Print();
-			//vec_tree->Copy(message_tree);
+			vec_tree->Copy(message_tree);
+			//vec_tree->Print(local_count);
 			cout << "worker "<< myrank << " pushed tree"<< "\n";
 			local_count=local_count+1;
 		}

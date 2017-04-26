@@ -17,9 +17,10 @@ int main(int argv, char * args[]) {
 //  batch_data->samples.push_back(sample);
 
 //  write_batch_data(batch_data, file_name);
+  //FLAGS_logtostderr = 1;
+  //google::InitGoogleLogging(args[0]);
   cout << args[1][0] << "\n";
   Dabtree(args[1][0]-'0');
-
 
   return 0;
 }
