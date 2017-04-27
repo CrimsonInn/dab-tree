@@ -6,6 +6,9 @@ import include.data_pb2 as data_pb2
 import pandas as pd 
 import numpy as np 
 
+READ_DATA_SIZE = 10000
+WORKER_NUM = 5
+
 
 def load_raw_data(file_name):
   data_ = pd.read_csv(file_name)
@@ -49,7 +52,7 @@ def load_raw_data(file_name):
   data_matrix = data_filled.values
   np.random.shuffle(data_matrix)
   data_matrix = np.array(data_matrix)
-  return fea_types, data_matrix[0:1000, :]
+  return fea_types, data_matrix[0:READ_DATA_SIZE, :]
 
 
 def write(fea_types, value_matrix, file_name):
@@ -99,7 +102,7 @@ def write(fea_types, value_matrix, file_name):
 
   with open(file_name, "wb") as f:
     f.write(batch_data.SerializeToString())
-  print("Success!")
+  print("protobuf file %s store success!" % file_name)
 
 
 def read(file_name):
@@ -134,13 +137,17 @@ def main():
   # fea_types = ["CONT", "CONT", "DISC", "RANK"]
   # value_matrix = [[0,1,0,2],[0,1,0,0],[0,0.4,0,0],[0,0.4,1,0]]
 
-  file_name = "BATCH_DATA_FILE"
+  # file_name = "BATCH_DATA_FILE"
   data_file_name = "train.csv"
-  print("begin")
+  print("Begin load data ... ")
   fea_types, value_matrix = load_raw_data(data_file_name)
-  print(fea_types.shape)
-  print(value_matrix.shape)
-  write(fea_types, value_matrix, file_name)
+  print("Fea_type shape: ", fea_types.shape)
+  print("Value shape: ", value_matrix.shape)
+  # write(fea_types, value_matrix, file_name)
+
+  slice_size = READ_DATA_SIZE // WORKER_NUM
+  for i in range(WORKER_NUM):
+    write(fea_types, value_matrix[(i * slice_size) : ((i + 1) * slice_size), :], str(i + 1))
 
 
 if __name__ == "__main__":

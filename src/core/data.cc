@@ -3,13 +3,12 @@
 
 DataProvider::DataProvider(const std::string &file_name) {
 
-  row_index = 0;
-
   // Verify that the version of the protobuf that we linked against is
   // compatible with the version of the headers we compiled against.
   GOOGLE_PROTOBUF_VERIFY_VERSION;
+  row_index = 0;
   LOG(INFO) << "Init DataProvider ..." ;
-  LOG(INFO) << "Begin read protobuf file ..." ;
+  LOG(INFO) << "Begin read protobuf file " << file_name << " ..." ;
   rawdata::Matrix read_batch_data;
 
   // Read the existing address book.
@@ -46,6 +45,7 @@ DataProvider::DataProvider(const std::string &file_name) {
     }
     samples_.Add(sample);
   }
+  LOG(INFO) << "Succeed!" ;
 }
 
 
@@ -88,6 +88,7 @@ void DataProvider::print_samples(size_t row_num) {
   }
   return ;
 }
+
 
 void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size) {
   size_t width = samples_.GetWidth();
