@@ -199,7 +199,7 @@ void Matrix::BestSplitDISC(size_t col_id, size_t low, size_t high) {
 //        }
     }
   size_t best = std::max_element(results.begin(), results.end()) - results.begin();
-  float best_sse
+//  float best_sse
 }
 
 
