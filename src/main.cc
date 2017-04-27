@@ -16,7 +16,7 @@ int main(int argv, char * args[]) {
 //  write_batch_data(batch_data, file_name);
   //FLAGS_logtostderr = 1;
   //google::InitGoogleLogging(args[0]);
-  cout << args[1][0] << "\n";
-  Dabtree(args[1][0]-'0');
+  cout << std::stoi(std::string(args[1])) << "\n";
+  Dabtree(std::stoi(std::string(args[1])));
   return 0;
 }

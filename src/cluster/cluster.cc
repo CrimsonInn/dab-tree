@@ -16,7 +16,16 @@ DLLEXPORT int run(){
     return 0;
 }
 
-
+#include <time.h>
+#include <sys/time.h>
+double get_wall_time(){
+    struct timeval time;
+    if (gettimeofday(&time,NULL)){
+        //  Handle error
+        return 0;
+    }
+    return (double)time.tv_sec + (double)time.tv_usec * .000001;
+}
 
 DLLEXPORT int Dabtree(int round){
 	int myrank, comm_sz;
@@ -108,13 +117,13 @@ EnsembleMessageTreePtr Master(int round, int comm_sz, MPI_Datatype &MPI_TREE){
 void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 	int local_count=0;
 	MPI_Status stat;
-	RegTreePtr vec_tree(new RegTree);
-	Trainer trainer("BATCH_DATA_FILE"+ to_string(myrank));
+	//RegTreePtr vec_tree(new RegTree);
+	Trainer trainer(to_string(myrank));
 	for (int i=0; i<round;i++){
 		//call train local here
 
 		trainer.TrainOneBatch();//TrainLocal();
-		cout<< "tree on worker "<< myrank << " is "<< vec_tree->NumTrees()<<" local_count is "<< local_count << "\n";
+		cout<< "tree on worker "<< myrank << " is "<< trainer.tree.NumTrees()<<" local_index is "<< local_count << "\n";
 		//cout<<(trainer.tree.Print(local_count));
 
 		//MessageTreePtr message_tree = vec_tree -> GetMessageTree(local_count);
@@ -130,7 +139,7 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 			MPI_Recv(message_tree.get(), 1, MPI_TREE, 0,0,MPI_COMM_WORLD, &stat);
 			cout << "worker "<< myrank << " receive tree id "<< message_tree->id << ", " << local_count << "\n";
 			//vec_tree->Copy(message_tree);
-			trainer.tree.Copy(message_tree);
+			//trainer.tree.Copy(message_tree);
 			//vec_tree->Print(local_count);
 			cout << "worker "<< myrank << " pushed tree"<< "\n";
 			local_count=local_count+1;
