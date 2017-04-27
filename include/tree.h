@@ -5,9 +5,9 @@
 #include <memory>
 #include "data.h"
 #include "matrix.h"
-#include "ThreadPool.h"
 
 const size_t MAX_NODE_SIZE = 64;
+const size_t MIN_SAMPLENUM_SPLIT = 100;
 
 struct node {
   size_t row_id;

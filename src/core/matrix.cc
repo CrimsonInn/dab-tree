@@ -39,6 +39,8 @@ void Matrix::Sort(size_t col_id, size_t low, size_t high) {
 
 size_t Matrix::Split(size_t col_id, size_t low, size_t high, size_t cls) {
   CHECK_EQ(fea_type(col_id), FeaType::DISC);
+  CHECK_LE(high, GetHeight());
+  CHECK_LT(col_id, GetWidth());
 
   std::sort(data_.begin() + low,
             data_.begin() + high,

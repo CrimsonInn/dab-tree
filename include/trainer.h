@@ -15,7 +15,7 @@ public:
     tree = RegTree();
     tree.SetType(dp.get_fea_types());
     batch_size = 1000;
-    step_size = 1;
+    step_size = 0.1;
   }
 
   void TrainOneBatch() {
@@ -46,7 +46,7 @@ public:
     batch_ptr->SetType(0, FeaType::CONT);
 //    batch_ptr->Print();
     tree.TrainOneTree(batch_ptr, step_size);
-    step_size /= 1.0;
+    step_size /= 1;
 }
 
 private:
