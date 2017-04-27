@@ -116,16 +116,63 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
                 }
             }
         } else if (batch.fea_type(fea_id) == FeaType::CONT) {
-          size_t split_row = cur_node.low + MIN_SAMPLENUM_SPLIT;
-          while (split_row < cur_node.high) {
-              float cur_sse = batch.SSE(cur_node.low, split_row) + batch.SSE(split_row, cur_node.high);
-              if (best_fea == 0 || cur_sse < best_sse) {
-                  best_sse = cur_sse;
-                  best_fea = fea_id;
-                  best_split_value.v = batch(split_row, fea_id).v;
+//          size_t split_row = cur_node.low + MIN_SAMPLENUM_SPLIT;
+          std::vector<size_t> counts;
+          std::vector<float> sums;
+          std::vector<float> sss;
+          std::vector<float> splits;
+          float count = 0;
+          float sum = 0.0;
+          float ss = 0.0;
+          float split;
+          for (size_t base_row = cur_node.low; base_row < cur_node.high; base_row += MIN_SAMPLENUM_SPLIT) {
+              for (size_t idx = 0; idx < MIN_SAMPLENUM_SPLIT; ++idx) {
+                  size_t cur_row = base_row+idx;
+                  if (cur_row >= cur_node.high) break;
+                  count += 1;
+                  sum += batch(cur_row, 0).v;
+                  ss += batch(cur_row, 0).v * batch(cur_row, 0).v;
+                  split = batch(cur_row, fea_id).v;
                 }
-              split_row += MIN_SAMPLENUM_SPLIT;
+              if (count != 0) {
+                  counts.push_back(count);
+                  sums.push_back(sum);
+                  sss.push_back(ss);
+                  splits.push_back(split);
+                  count = 0;
+                  sum = 0.0;
+                  ss = 0.0;
+                }
+
             }
+          float total_sum = 0.0;
+          float total_ss = 0.0;
+          size_t total_count = cur_node.high - cur_node.low;
+          for (auto& elem : sums)
+            total_sum += elem;
+          for (auto& elem : sss)
+            total_ss += elem;
+          for (size_t i = 0; i < counts.size(); ++i) {
+              float tmp = sss[i] - counts[i]*(sums[i]*sums[i]/counts[i]/counts[i]);
+              float tmp_ss = total_ss - sss[i];
+              float tmp_mean = (total_sum - sums[i])/counts[i];
+              tmp += tmp_ss - (total_count - counts[i]) * tmp_mean * tmp_mean;
+              if (best_fea == 0 || tmp < best_sse) {
+                  best_sse = tmp;
+                  best_fea = fea_id;
+                  best_split_value.v = splits[i];
+                }
+            }
+
+//          while (split_row < cur_node.high) {
+//              float cur_sse = batch.SSE(cur_node.low, split_row) + batch.SSE(split_row, cur_node.high);
+//              if (best_fea == 0 || cur_sse < best_sse) {
+//                  best_sse = cur_sse;
+//                  best_fea = fea_id;
+//                  best_split_value.v = batch(split_row, fea_id).v;
+//                }
+//              split_row += MIN_SAMPLENUM_SPLIT;
+//            }
         } else if (batch.fea_type(fea_id) == FeaType::RANK) {
           size_t split_row = cur_node.low;
           int cur_value = batch(split_row, fea_id).level;
