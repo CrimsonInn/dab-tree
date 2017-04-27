@@ -12,10 +12,8 @@
 
 // this is only a test of python interface
 DLLEXPORT int run(){
-	//int myrank, comm_sz;
-
     cout << "success \n";
-    return 1;
+    return 0;
 }
 
 
@@ -41,28 +39,30 @@ DLLEXPORT int Dabtree(int round){
 	MPI_Type_commit(&MPI_TREE);
 
 
-	cout << "start working"<< "\n";
+	cout <<"thread "<< myrank<<" start working"<< "\n";
 	if (myrank==0){
+		double time = get_wall_time();
 		EnsembleMessageTreePtr tree = Master(round, comm_sz, MPI_TREE);
-		MPI_Barrier(MPI_COMM_WORLD);
-		cout << "master print trees \n";
+		//MPI_Barrier(MPI_COMM_WORLD);
+		//cout << "master print trees \n";
 
 		//for(auto tr : *tree){
 		//	cout<<(tr->Print());
 		//}
-		cout << "master success \n";
+		cout << "master success, time "<<get_wall_time()-time<< " \n";
+
 	}
 	else{
 		Worker(round,myrank, MPI_TREE);
 		cout << "worker success \n";
-		MPI_Barrier(MPI_COMM_WORLD);
+		//MPI_Barrier(MPI_COMM_WORLD);
 	}
-
-    
 
     MPI_Type_free(&MPI_TREE);
     MPI_Finalize();
     return 0;
+
+
 }
 
 
@@ -109,7 +109,7 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 	int local_count=0;
 	MPI_Status stat;
 	RegTreePtr vec_tree(new RegTree);
-	Trainer trainer("BATCH_DATA_FILE");
+	Trainer trainer("BATCH_DATA_FILE"+ to_string(myrank));
 	for (int i=0; i<round;i++){
 		//call train local here
 
