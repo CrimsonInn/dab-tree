@@ -118,7 +118,7 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 	int local_count=0;
 	MPI_Status stat;
 	//RegTreePtr vec_tree(new RegTree);
-	Trainer trainer(to_string(myrank));
+	Trainer trainer("BATCH_DATA_FILE");//to_string(myrank));
 	for (int i=0; i<round;i++){
 		//call train local here
 
@@ -139,7 +139,7 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 			MPI_Recv(message_tree.get(), 1, MPI_TREE, 0,0,MPI_COMM_WORLD, &stat);
 			cout << "worker "<< myrank << " receive tree id "<< message_tree->id << ", " << local_count << "\n";
 			//vec_tree->Copy(message_tree);
-			//trainer.tree.Copy(message_tree);
+			trainer.tree.Copy(message_tree);
 			//vec_tree->Print(local_count);
 			cout << "worker "<< myrank << " pushed tree"<< "\n";
 			local_count=local_count+1;

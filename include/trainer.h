@@ -15,7 +15,7 @@ public:
     tree = RegTree();
     tree.SetType(dp.get_fea_types());
     batch_size = 1000;
-    step_size = 1;
+    step_size = 0.01;
   }
 
   void TrainOneBatch() {
