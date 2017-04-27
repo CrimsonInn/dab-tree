@@ -1,6 +1,10 @@
 #include "tree.h"
 #include <glog/logging.h>
 #include "ThreadPool.h"
+#include "thread"
+#include <mutex>
+
+std::mutex mu;
 const size_t MIN_SAMPLENUM_SPLIT = 2;
 
 bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
@@ -52,6 +56,7 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
 
 
 void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
+//  LOG(INFO) << cur_node.row_id << " " << cur_node.row_id << " " << cur_node.low << " " << cur_node.high;
   if (cur_node.col_id >= MAX_NODE_SIZE) return;
   if (cur_node.high - cur_node.low <= MIN_SAMPLENUM_SPLIT
       || cur_node.col_id*2 >= MAX_NODE_SIZE) {
@@ -63,20 +68,19 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
   float best_sse = 0.0;
   size_t best_fea = 0;
   Value best_split_value;
-  Matrix& batch = (*batch_ptr);
-  for (size_t fea_id = 1; fea_id < batch.GetWidth(); ++fea_id) {
-      batch.Sort(fea_id, cur_node.low, cur_node.high);
-      if (batch.fea_type(fea_id) == FeaType::DISC) {
+  for (size_t fea_id = 1; fea_id < batch_ptr->GetWidth(); ++fea_id) {
+      batch_ptr->Sort(fea_id, cur_node.low, cur_node.high);
+      if (batch_ptr->fea_type(fea_id) == FeaType::DISC) {
           std::vector<size_t> counts;
           std::vector<float> sums;
           std::vector<float> sss;
           std::vector<size_t> splits;
           float count = 1;
-          float sum = batch(0, 0).v;
+          float sum = (*batch_ptr)(0, 0).v;
           float ss = sum*sum;
-          size_t split = batch(0, fea_id).cls;
+          size_t split = (*batch_ptr)(0, fea_id).cls;
           for (size_t cur_row = cur_node.low+1; cur_row < cur_node.high; ++cur_row) {
-              if (split != batch(cur_row, fea_id).cls) {
+              if (split != (*batch_ptr)(cur_row, fea_id).cls) {
                   counts.push_back(count);
                   sums.push_back(sum);
                   sss.push_back(ss);
@@ -86,9 +90,10 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
                   ss = 0.0;
                 }
               count += 1;
-              sum += batch(cur_row, 0).v;
-              ss += batch(cur_row, 0).v * batch(cur_row, 0).v;
-              split = batch(cur_row, fea_id).cls;
+              float tmp_v = (*batch_ptr)(cur_row, 0).v;
+              sum += tmp_v;
+              ss += tmp_v*tmp_v;
+              split = (*batch_ptr)(cur_row, fea_id).cls;
             }
           if (count != 0) {
               counts.push_back(count);
@@ -115,7 +120,7 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
                   best_split_value.cls = splits[i];
                 }
             }
-        } else if (batch.fea_type(fea_id) == FeaType::CONT) {
+        } else if (batch_ptr->fea_type(fea_id) == FeaType::CONT) {
 //          size_t split_row = cur_node.low + MIN_SAMPLENUM_SPLIT;
           std::vector<size_t> counts;
           std::vector<float> sums;
@@ -130,9 +135,10 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
                   size_t cur_row = base_row+idx;
                   if (cur_row >= cur_node.high) break;
                   count += 1;
-                  sum += batch(cur_row, 0).v;
-                  ss += batch(cur_row, 0).v * batch(cur_row, 0).v;
-                  split = batch(cur_row, fea_id).v;
+                  float tmp_v = (*batch_ptr)(cur_row, 0).v;
+                  sum += tmp_v;
+                  ss += tmp_v*tmp_v;
+                  split = (*batch_ptr)(cur_row, fea_id).v;
                 }
               if (count != 0) {
                   counts.push_back(count);
@@ -173,14 +179,14 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
 //                }
 //              split_row += MIN_SAMPLENUM_SPLIT;
 //            }
-        } else if (batch.fea_type(fea_id) == FeaType::RANK) {
+        } else if (batch_ptr->fea_type(fea_id) == FeaType::RANK) {
           size_t split_row = cur_node.low;
-          int cur_value = batch(split_row, fea_id).level;
+          int cur_value = (*batch_ptr)(split_row, fea_id).level;
           while (true) {
-              while (split_row < cur_node.high && cur_value == batch(split_row, fea_id).level) split_row++;
+              while (split_row < cur_node.high && cur_value == (*batch_ptr)(split_row, fea_id).level) split_row++;
               if (split_row == cur_node.high) break;
-              cur_value = batch(split_row, fea_id).level;
-              float cur_sse = batch.SSE(cur_node.low, split_row) + batch.SSE(split_row, cur_node.high);
+              cur_value = (*batch_ptr)(split_row, fea_id).level;
+              float cur_sse = batch_ptr->SSE(cur_node.low, split_row) + batch_ptr->SSE(split_row, cur_node.high);
               if (best_fea == 0 || cur_sse < best_sse) {
                   best_sse = cur_sse;
                   best_fea = fea_id;
@@ -188,9 +194,8 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
                 }
             }
         }
-
     }// for
-  float non_split_sse = batch.SSE(cur_node.low, cur_node.high);
+  float non_split_sse = batch_ptr->SSE(cur_node.low, cur_node.high);
   if (non_split_sse < best_sse) {
       split_value_.SetValue(cur_node.row_id, cur_node.col_id,
       {.v=batch_ptr->ColMean(0, cur_node.low, cur_node.high)});
@@ -201,24 +206,35 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
   split_value_.SetValue(cur_node.row_id, cur_node.col_id, best_split_value);
 
   size_t mid = cur_node.low;
-  if (batch.fea_type(best_fea) == FeaType::CONT) {
-      batch.Sort(best_fea, cur_node.low, cur_node.high);
-      while(mid < cur_node.high && batch(mid, best_fea).v < best_split_value.v) mid++;
-    } else if (batch.fea_type(best_fea) == FeaType::DISC) {
-      mid = batch.Split(best_fea, cur_node.low, cur_node.high, best_split_value.cls);
-    } else if (batch.fea_type(best_fea) == FeaType::RANK) {
-      batch.Sort(best_fea, cur_node.low, cur_node.high);
-      while(batch(mid, best_fea).level < best_split_value.level) mid++;
+
+
+  if (batch_ptr->fea_type(best_fea) == FeaType::CONT) {
+      batch_ptr->Sort(best_fea, cur_node.low, cur_node.high);
+      while(mid < cur_node.high && (*batch_ptr)(mid, best_fea).v < best_split_value.v) mid++;
+    } else if (batch_ptr->fea_type(best_fea) == FeaType::DISC) {
+      mid = batch_ptr->Split(best_fea, cur_node.low, cur_node.high, best_split_value.cls);
+    } else if (batch_ptr->fea_type(best_fea) == FeaType::RANK) {
+      mu.lock();
+      batch_ptr->Sort(best_fea, cur_node.low, cur_node.high);
+      mu.unlock();
+      while((*batch_ptr)(mid, best_fea).level < best_split_value.level) mid++;
     }
+
   node left = {.row_id=cur_node.row_id, .col_id=cur_node.col_id*2, .low = cur_node.low, .high=mid};
   node right = {.row_id=cur_node.row_id, .col_id=cur_node.col_id*2+1, .low = mid, .high=cur_node.high};
 //  ThreadPool pool_(2);
 
 //  pool_.enqueue([&]() {
+//  std::thread t1([&, this, batch_ptr, left](){GrowNode(batch_ptr, left);});
   GrowNode(batch_ptr, left);
 //    });
 //  pool_.enqueue([&]() {
+
   GrowNode(batch_ptr, right);
+//  std::thread t2([&, this, batch_ptr, right](){GrowNode(batch_ptr, right);});
+//  t1.join();
+
+//  t2.join();
 //    });
   return;
 }

@@ -3,7 +3,6 @@
 #include <iostream>
 #include <glog/logging.h>
 
-
 Matrix::Matrix(size_t width, size_t height, FeaType type) {
   fea_types_ = {type};
   if (type == FeaType::CONT) {
