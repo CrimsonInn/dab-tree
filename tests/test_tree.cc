@@ -3,15 +3,6 @@
 #include <memory>
 #include "data.h"
 #include "tree.h"
-#include "trainer.h"
-
-TEST(TreeTest, TrainOneBatch) {
-  Trainer trainer("BATCH_DATA_FILE");
-  for (size_t i = 0; i < 20; ++i) {
-      trainer.TrainOneBatch();
-    }
-  trainer.tree.Print();
-}
 
 
 TEST(TreeTest, OneTreePredict) {

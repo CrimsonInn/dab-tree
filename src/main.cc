@@ -1,7 +1,6 @@
 #include <iostream>
 #include <glog/logging.h>
 #include "data.h"
-
 #include "cluster.h"
 //#include "proto_func.h"
 
@@ -9,6 +8,7 @@
 
 
 int main(int argv, char * args[]) {
+
 
 //  std::string file_name = "BATCH_DATA_FILE";
 //  BatchPtr batch_data = std::make_shared<Batch>();;

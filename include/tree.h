@@ -7,9 +7,13 @@
 #include "data.h"
 #include "message_tree.h"
 #include "matrix.h"
+
 #include <glog/logging.h>
 #include <sstream> 
 #include <string>
+
+#include "ThreadPool.h"
+
 
 //const size_t MAX_NODE_SIZE = 64;
 
