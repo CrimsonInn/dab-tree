@@ -13,7 +13,7 @@
 class DataProvider {
 public:
 
-  DataProvider(){ row_index = 0; }
+  DataProvider() { row_index = 0; }
   DataProvider(const std::string &file_name);
 
   size_t num_samples() {

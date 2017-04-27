@@ -121,20 +121,6 @@ void Matrix::Print(size_t row_num) {
 }
 
 
-//float Matrix::BestSplit(size_t low, size_t high, size_t step, ) {
-//  FeaType type = fea_type(0);
-//  CHECK_EQ(type, FeaType::CONT);
-//  if (high <= low) return 0.0;
-//  float mean = ColMean(0, low, high);
-//  float result = 0.0;
-//  for (size_t row_id = low; row_id < high; ++row_id) {
-//    float tmp = data_[row_id][0].v - mean;
-//    result += tmp*tmp;
-//  }
-//  return result;
-//}
-
-
 void Matrix::BestSplitDISC(size_t col_id, size_t low, size_t high) {
   size_t total_count = high - low;
   std::vector<std::vector<Value>> tmpdata;
