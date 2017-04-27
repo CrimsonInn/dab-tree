@@ -6,26 +6,34 @@
 #include "tree.h"
 
 const int worker_num = 5;
+const bool test_batch = true;
 
 TEST(DataTest, LoadProto) {
 
-  DataProvider data_providers[worker_num];
-  for (size_t i = 0; i < worker_num; ++i) {
-    data_providers[i] = DataProvider(std::to_string(i + 1));
-  }
+  if(test_batch) {
+    const std::string file_name = "BATCH_DATA_FILE";
+    DataProvider data_provider = DataProvider(file_name);
+    std::cout << "------- PRINT FIRST THREE ROW --------" << std::endl;
+    data_provider.print_samples(3);
+    std::cout << "--------------------------------------" << std::endl;
+  } else {
+    DataProvider data_providers[worker_num];
+    for (size_t i = 0; i < worker_num; ++i) {
+      data_providers[i] = DataProvider(std::to_string(i + 1));
+    }
 
-  std::cout << "------- PRINT FIRST THREE ROW --------" << std::endl;
-  data_providers[0].print_samples(3);
-  std::cout << "--------------------------------------" << std::endl;
+    std::cout << "------- PRINT FIRST THREE ROW --------" << std::endl;
+    data_providers[0].print_samples(3);
+    std::cout << "--------------------------------------" << std::endl;
 
-  for (size_t i = 0; i < worker_num; ++i) {
-    ASSERT_FLOAT_EQ(data_providers[i].num_feas(), data_providers[(i + 1) % worker_num].num_feas());
+    for (size_t i = 0; i < worker_num; ++i) {
+      ASSERT_FLOAT_EQ(data_providers[i].num_feas(), data_providers[(i + 1) % worker_num].num_feas());
+    }
+    
+    for (size_t i = 0; i < worker_num; ++i) {
+      ASSERT_FLOAT_EQ(data_providers[i].num_samples(), data_providers[(i + 1) % worker_num].num_samples());
+    }
   }
-  
-  for (size_t i = 0; i < worker_num; ++i) {
-    ASSERT_FLOAT_EQ(data_providers[i].num_samples(), data_providers[(i + 1) % worker_num].num_samples());
-  }
-
 }
 
 // TEST(TreeTest, OneTreePredict) {

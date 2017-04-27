@@ -6,9 +6,9 @@ import include.data_pb2 as data_pb2
 import pandas as pd 
 import numpy as np 
 
-READ_DATA_SIZE = 10000
+READ_DATA_SIZE = 100000
 WORKER_NUM = 5
-
+WRITE_BATCH_FILE = 1
 
 def load_raw_data(file_name):
   data_ = pd.read_csv(file_name)
@@ -137,17 +137,19 @@ def main():
   # fea_types = ["CONT", "CONT", "DISC", "RANK"]
   # value_matrix = [[0,1,0,2],[0,1,0,0],[0,0.4,0,0],[0,0.4,1,0]]
 
-  # file_name = "BATCH_DATA_FILE"
+  
   data_file_name = "train.csv"
   print("Begin load data ... ")
   fea_types, value_matrix = load_raw_data(data_file_name)
   print("Fea_type shape: ", fea_types.shape)
   print("Value shape: ", value_matrix.shape)
-  # write(fea_types, value_matrix, file_name)
-
-  slice_size = READ_DATA_SIZE // WORKER_NUM
-  for i in range(WORKER_NUM):
-    write(fea_types, value_matrix[(i * slice_size) : ((i + 1) * slice_size), :], str(i + 1))
+  if WRITE_BATCH_FILE > 0:
+    file_name = "BATCH_DATA_FILE"
+    write(fea_types, value_matrix, file_name)
+  else:
+    slice_size = READ_DATA_SIZE // WORKER_NUM
+    for i in range(WORKER_NUM):
+      write(fea_types, value_matrix[(i * slice_size) : ((i + 1) * slice_size), :], str(i + 1))
 
 
 if __name__ == "__main__":
