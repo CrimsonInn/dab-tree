@@ -17,7 +17,8 @@ TEST(TreeTest, OneTreePredict) {
   tree->AddOneTree(feas, values);
 //  tree->Print();
 
-  MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));
+  MatrixPtr batch = std::make_shared<Matrix>();
+  batch->Create(4, 4);
   batch->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
   batch->Copy(0, {{.v=0.0}, {.v=1}, {.cls=0}, {.level=2}});
   batch->Copy(1, {{.v=0.0}, {.v=1}, {.cls=0}, {.level=0}});
@@ -46,7 +47,8 @@ TEST(TreeTest, EnsemblePredict) {
 //  tree->Print();
 
 
-  MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));
+  MatrixPtr batch = std::make_shared<Matrix>();
+  batch->Create(4, 4);
   batch->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
   batch->Copy(0, {{.v=0.0}, {.v=1}, {.cls=0}, {.level=2}});
   batch->Copy(1, {{.v=0.0}, {.v=1}, {.cls=0}, {.level=0}});

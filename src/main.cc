@@ -1,6 +1,7 @@
 #include <iostream>
 #include <glog/logging.h>
 #include "data.h"
+
 #include "cluster.h"
 //#include "proto_func.h"
 
@@ -18,5 +19,6 @@ int main(int argv, char * args[]) {
   //google::InitGoogleLogging(args[0]);
   cout << std::stoi(std::string(args[1])) << "\n";
   Dabtree(std::stoi(std::string(args[1])));
+
   return 0;
 }

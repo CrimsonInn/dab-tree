@@ -5,10 +5,12 @@
 
 TEST(TreeTest, TrainOneBatch) {
   Trainer trainer("BATCH_DATA_FILE");
-  for (size_t i = 0; i < 20; ++i) {
+//  Trainer trainer("1");
+
+  for (size_t i = 0; i < 50; ++i) {
       trainer.TrainOneBatch();
     }
-  trainer.tree.Print();
+//  trainer.tree.Print();
 }
 
 int main(int argc, char **argv) {
