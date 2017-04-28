@@ -13,7 +13,15 @@
 class DataProvider {
 public:
 
-  DataProvider() { row_index = 0; }
+  DataProvider() { 
+    row_index = 0;
+    int height = sample_ptr_->GetHeight();
+    indexes_.resize(height);
+    for (int i = 0; i < height; ++i) {
+      indexes_[i] = i;
+    }
+  }
+
   DataProvider(const std::string &file_name);
 
   size_t num_samples() {
@@ -49,12 +57,23 @@ public:
     return samptr;
   }
 
+  size_t get_index(size_t i) {
+    return indexes_[i];
+  }
+
+  std::vector<size_t> get_indexes(){
+    return indexes_;
+  }
+
   void get_next_batch(MatrixPtr batch_ptr, size_t batch_size);
 
   void print_samples(size_t row_num);
 
+  MatrixPtr get_validation(size_t vali_size = 1000);
+
 private:
   int row_index;
+  std::vector<size_t> indexes_;
   MatrixPtr sample_ptr_ = std::make_shared<Matrix>();
 };
 

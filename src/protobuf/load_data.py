@@ -8,7 +8,7 @@ import numpy as np
 
 READ_DATA_SIZE = 100000
 WORKER_NUM = 5
-WRITE_BATCH_FILE = 1
+WRITE_BATCH_FILE = 0
 
 def load_raw_data(file_name):
   data_ = pd.read_csv(file_name)

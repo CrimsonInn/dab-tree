@@ -1,5 +1,7 @@
 #include "data.h"
 #include <glog/logging.h>
+#include <algorithm>
+#include <random>
 
 DataProvider::DataProvider(const std::string &file_name) {
 
@@ -23,6 +25,11 @@ DataProvider::DataProvider(const std::string &file_name) {
   unsigned int width = read_batch_data.width();
   unsigned int height = read_batch_data.height();
 
+  indexes_.resize(height);
+  for (size_t i = 0; i < height; ++i) {
+    indexes_[i] = i;
+  }
+
   std::vector<FeaType> ft;
   for (size_t i = 0; i < width; ++i) {
     ft.push_back(FeaType(read_batch_data.fea_types(i)));
@@ -31,13 +38,14 @@ DataProvider::DataProvider(const std::string &file_name) {
 
   for (size_t i = 0; i < height; ++i) {
     std::vector<Value> sample;
+    size_t index = indexes_[i];
     for (size_t j = 0; j < width; ++j) {
       if (sample_ptr_->fea_type(j) == CONT){
-        sample.push_back({.v = read_batch_data.data(i * width + j).v()});
+        sample.push_back({.v = read_batch_data.data(index * width + j).v()});
       } else if (sample_ptr_->fea_type(j) == DISC) {
-        sample.push_back({.cls = read_batch_data.data(i * width + j).cls()});
+        sample.push_back({.cls = read_batch_data.data(index * width + j).cls()});
       } else if (sample_ptr_->fea_type(j) == RANK) {
-        sample.push_back({.level = static_cast<int>(read_batch_data.data(i * width + j).level())});
+        sample.push_back({.level = static_cast<int>(read_batch_data.data(index * width + j).level())});
       } else {
         LOG(ERROR) << "Protobuf data type error.";
         return ;
@@ -72,13 +80,14 @@ void DataProvider::print_samples(size_t row_num) {
 
   std::cout << "Values:" << std::endl;
   for (size_t i = 0; i < row_num; ++i) {
+    size_t index = indexes_[i];
     for (size_t j = 0; j < width; ++j) {
       if (sample_ptr_->fea_type(j) == CONT){
-        std::cout << "v: " << (*sample_ptr_)(i, j).v << " ";
+        std::cout << "v: " << (*sample_ptr_)(index, j).v << " ";
       } else if (sample_ptr_->fea_type(j) == DISC) {
-        std::cout << "cls: " << (*sample_ptr_)(i, j).cls << " ";
+        std::cout << "cls: " << (*sample_ptr_)(index, j).cls << " ";
       } else if (sample_ptr_->fea_type(j) == RANK) {
-        std::cout << "level: " << (*sample_ptr_)(i, j).level << " ";
+        std::cout << "level: " << (*sample_ptr_)(index, j).level << " ";
       } else {
         LOG(ERROR) << "Data type error.";
         return ;
@@ -96,10 +105,34 @@ void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size) {
   batch_ptr->resize(batch_size, width);
   batch_ptr->SetType(sample_ptr_->fea_types());
   int height = sample_ptr_->GetHeight();
-  size_t i = 0;
-  for (i = 0; i < batch_size; ++i) {
-//    batch_ptr->AddOneRow(num_feas());
-    batch_ptr->Copy(i, sample_ptr_->data((i + row_index) % height));
+  for (size_t i = 0; i < batch_size; ++i) {
+    size_t index = indexes_[i];
+    batch_ptr->Copy(i, sample_ptr_->data((index + row_index) % height));
   }
-  row_index = (i + row_index) % height; 
+
+  // std::cout << i << ", " << row_index << ", " << i + row_index << std::endl;
+
+  if (batch_size + row_index >= height) {
+    // std::cout << batch_size << ", " << row_index << ", " << batch_size + row_index << std::endl;
+    std::random_shuffle(indexes_.begin(), indexes_.end());
+  }
+  row_index = (batch_size + row_index) % height; 
 }
+
+
+MatrixPtr DataProvider::get_validation(size_t vali_size) {
+  MatrixPtr vali_ptr = std::make_shared<Matrix>();
+  size_t width = sample_ptr_->GetWidth();
+  vali_ptr->resize(vali_size, width);
+  vali_ptr->SetType(sample_ptr_->fea_types());
+  int height = sample_ptr_->GetHeight();
+  if (vali_size > height) {
+    LOG(ERROR) << "Demand validation data size too large." ;
+    return NULL;
+  }
+  for (size_t i = 0; i < vali_size; ++i) {
+    vali_ptr->Copy(i, sample_ptr_->data(i));
+  }
+  return vali_ptr;
+}
+
