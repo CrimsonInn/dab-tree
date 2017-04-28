@@ -12,9 +12,9 @@ public:
 
   Trainer(const std::string proto_name) {
     dp = DataProvider(proto_name);
-    tree = RegTree();
+    RegTree tree;
     tree.SetType(dp.get_fea_types());
-    batch_size = 1000;
+    batch_size = 10000;
     step_size = 0.1;
   }
 
@@ -31,13 +31,13 @@ public:
       float y = (*batch_ptr)(i, 0).cls == 0? -1 : 1;
       float margin = (*result_ptr)[i] * y;
 
-//      float tmp = margin < 1? 1-margin: 0;
-      float tmp = std::exp(-margin);
+      float tmp = margin < 1? 1-margin: 0;
+//      float tmp = std::exp(-margin);
       loss += tmp;
-//      if (margin < 1) batch_ptr->SetValue(i, 0, {.v = y});
-//      else
-//        batch_ptr->SetValue(i, 0, {.v = 0.0});
-      batch_ptr->SetValue(i, 0, {.v = y*tmp});
+      if (margin < 1) batch_ptr->SetValue(i, 0, {.v = y});
+      else
+        batch_ptr->SetValue(i, 0, {.v = 0.0});
+//      batch_ptr->SetValue(i, 0, {.v = y*tmp});
 
       if (margin < 0)
         err += 1;

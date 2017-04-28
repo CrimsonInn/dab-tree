@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 #include <glog/logging.h>
-// #include "data.h"
 #include <mutex>
+
 enum FeaType {
   CONT = 0,
   DISC = 1,
@@ -19,18 +19,32 @@ union Value {
 };
 
 class Matrix {
+  std::mutex mu;
 public:
-  Matrix(){}
+  Matrix() {}
 
-  Matrix(std::vector<std::vector<Value>>& d,
-         std::vector<FeaType>& t) :
-    data_(d), fea_types_(t) {}
 
-  Matrix(size_t width, size_t height) {
+  Matrix& operator=(const Matrix&) =delete;
+  void Create(std::vector<std::vector<Value>>& d,
+              std::vector<FeaType>& t) {
+    data_ = d;
+    fea_types_ = t;
+  }
+
+  void Create(size_t width, size_t height) {
     data_ = std::vector<std::vector<Value>>(height, std::vector<Value>(width));
   }
 
-  Matrix(size_t width, size_t height, FeaType type);
+  void Create(size_t width, size_t height, FeaType type) {
+    fea_types_ = {type};
+    if (type == FeaType::CONT) {
+        data_ = std::vector<std::vector<Value>>(height, std::vector<Value>(width, {.v=0.0}));
+      } else if (type == FeaType::DISC) {
+        data_ = std::vector<std::vector<Value>>(height, std::vector<Value>(width, {.cls=0}));
+      } else if (type == FeaType::RANK) {
+        data_ = std::vector<std::vector<Value>>(height, std::vector<Value>(width, {.level=0}));
+      }
+  }
 
   bool Empty() {
     return data_.empty();
@@ -46,13 +60,6 @@ public:
   }
 
   void resize(size_t height, size_t width) {
-    
-    // for (size_t i = 0; i < height; ++i) {
-    //   std::vector<Value> values;
-    //   values.resize(width);
-    //   data_.push_back(values);
-    // }
-
     data_.resize(height, std::vector<Value>(width));
   }
 
@@ -69,6 +76,10 @@ public:
 
   std::vector<FeaType> fea_types() {
     return fea_types_;
+  }
+
+  std::vector<std::vector<Value>> data(){
+    return data_;
   }
 
 
@@ -100,6 +111,12 @@ public:
     data_ = values;
   }
 
+
+  void Copy(std::shared_ptr<Matrix> m) {
+    data_ = m->data();
+    fea_types_ = m->fea_types();
+  }
+
   void Add(const std::vector<Value>& values) {
     data_.push_back(values);
   }
@@ -111,6 +128,8 @@ public:
   }
 
   void Sort(size_t col_id, size_t low, size_t high);
+  void Sort(size_t col_id, size_t low, size_t high, size_t cls);
+
   size_t Split(size_t col_id, size_t low, size_t high, size_t cls);
   float ColMean(size_t col_id, size_t low, size_t high);
   float SSE(size_t low, size_t high);
@@ -120,7 +139,6 @@ public:
 private:
   std::vector<std::vector<Value>> data_;
   std::vector<FeaType> fea_types_;
-  void BestSplitDISC(size_t col_id, size_t low, size_t high);
 };
 
 typedef std::shared_ptr<Matrix> MatrixPtr;

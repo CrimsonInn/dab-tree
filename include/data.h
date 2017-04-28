@@ -17,35 +17,35 @@ public:
   DataProvider(const std::string &file_name);
 
   size_t num_samples() {
-    return samples_.GetHeight();
+    return sample_ptr_->GetHeight();
   }
 
   size_t num_feas() {
-    return samples_.GetWidth();
+    return sample_ptr_->GetWidth();
   }
 
   FeaType get_fea_type(size_t index) {
-    return samples_.fea_type(index);
+    return sample_ptr_->fea_type(index);
   }
 
   std::vector<FeaType> get_fea_types() {
-    return samples_.fea_types();
+    return sample_ptr_->fea_types();
   }
 
   Value get_value(size_t row_id, size_t col_id) {
-    return samples_(row_id, col_id);
+    return (*sample_ptr_)(row_id, col_id);
   }
 
   void set_fea_type(const std::vector<FeaType>& types) {
-    samples_.SetType(types);
+    sample_ptr_->SetType(types);
   }
 
   void add_data(const std::vector<Value>& value) {
-    samples_.Add(value);
+    sample_ptr_->Add(value);
   }
 
   MatrixPtr get_samples() {
-    MatrixPtr samptr = std::make_shared<Matrix>(samples_);
+    MatrixPtr samptr = sample_ptr_;
     return samptr;
   }
 
@@ -55,7 +55,7 @@ public:
 
 private:
   int row_index;
-  Matrix samples_ = Matrix();
+  MatrixPtr sample_ptr_ = std::make_shared<Matrix>();
 };
 
 
