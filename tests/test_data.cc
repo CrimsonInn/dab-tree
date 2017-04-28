@@ -6,7 +6,7 @@
 #include "tree.h"
 
 const int worker_num = 5;
-const bool test_batch = true;
+const bool test_batch = false;
 
 TEST(DataTest, LoadProto) {
 
@@ -25,6 +25,32 @@ TEST(DataTest, LoadProto) {
     std::cout << "------- PRINT FIRST THREE ROW --------" << std::endl;
     data_providers[0].print_samples(3);
     std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "------- PRINT GET_BATCH_DATA ---------" << std::endl;
+    MatrixPtr batch_data_ptr = std::make_shared<Matrix>();
+    data_providers[0].get_next_batch(batch_data_ptr, 1000);
+    batch_data_ptr->Print(3);
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+    size_t data_height = data_providers[0].num_samples();
+    size_t batch_size = 1000;
+    MatrixPtr shuf_batch_data_ptr = std::make_shared<Matrix>();
+    for (size_t i = 0; i < (data_height/batch_size + 1); ++i)
+    {
+      data_providers[0].get_next_batch(shuf_batch_data_ptr, batch_size);    
+    }
+    std::cout << "---- PRINT SHUFFLED GET_BATCH_DATA ---" << std::endl;
+    shuf_batch_data_ptr->Print(3);
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "------- PRINT VALIDATION DATA --------" << std::endl;
+    MatrixPtr vali_data = data_providers[0].get_validation();
+    vali_data->Print(3);
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
 
     for (size_t i = 0; i < worker_num; ++i) {
       ASSERT_FLOAT_EQ(data_providers[i].num_feas(), data_providers[(i + 1) % worker_num].num_feas());
@@ -33,6 +59,7 @@ TEST(DataTest, LoadProto) {
     for (size_t i = 0; i < worker_num; ++i) {
       ASSERT_FLOAT_EQ(data_providers[i].num_samples(), data_providers[(i + 1) % worker_num].num_samples());
     }
+
   }
 }
 
