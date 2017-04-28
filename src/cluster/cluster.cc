@@ -186,7 +186,7 @@ void BunddleWorker(int round, int myrank, MPI_Datatype &MPI_TREE){
 		for(int bunddle_index=0; bunddle_index<MESSAGE_TREE_BUNDDLE; bunddle_index++){
 			trainer.TrainOneBatch();//TrainLocal();
 			cout<< "tree trained on worker "<< myrank << " is "<< trainer.tree.NumTrees()<<" local_index is "<< local_count+bunddle_index << "\n";
-			cout<<(trainer.tree.Print(local_count+bunddle_index));
+			//cout<<(trainer.tree.Print(local_count+bunddle_index));
 			message_buffer[bunddle_index] = trainer.tree.GetStackMessageTree(local_count+bunddle_index);
 			message_buffer[bunddle_index].id=local_count+bunddle_index;
 			

@@ -14,7 +14,7 @@ public:
     dp = DataProvider(proto_name);
     tree = RegTree();
     tree.SetType(dp.get_fea_types());
-    batch_size = 1000;
+    batch_size = 10000;
     step_size = 0.01;
   }
 
