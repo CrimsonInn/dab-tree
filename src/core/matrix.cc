@@ -4,53 +4,48 @@
 #include <glog/logging.h>
 
 void Matrix::Sort(size_t col_id, size_t low, size_t high) {
-//  LOG(INFO) << "Sort";
-//  mu.lock();
   FeaType type = fea_type(col_id);
   if (type == FeaType::CONT) {
-      std::sort(data_.begin() + low,
-                data_.begin() + high,
-                [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
-                    return a[col_id].v < b[col_id].v;
-                });
-    } else if (type == FeaType::DISC) {
-      std::sort(data_.begin() + low,
-                data_.begin() + high,
-                [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
-                    return a[col_id].cls < b[col_id].cls;
-                });
-    } else if (type == FeaType::RANK) {
-      std::sort(data_.begin() + low,
-                data_.begin() + high,
-                [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
-                    return a[col_id].level < b[col_id].level;
-                });
-    }
-//  mu.unlock();
+    std::sort(data_.begin() + low,
+              data_.begin() + high,
+              [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
+                return a[col_id].v < b[col_id].v;
+              });
+  } else if (type == FeaType::DISC) {
+    std::sort(data_.begin() + low,
+              data_.begin() + high,
+              [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
+                return a[col_id].cls < b[col_id].cls;
+              });
+  } else if (type == FeaType::RANK) {
+    std::sort(data_.begin() + low,
+              data_.begin() + high,
+              [col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
+                return a[col_id].level < b[col_id].level;
+              });
+  }
 }
 void Matrix::Sort(size_t col_id, size_t low, size_t high, size_t cls) {
   std::sort(data_.begin() + low,
             data_.begin() + high,
             [cls, col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
-                return (a[col_id].cls-cls)*(a[col_id].cls-cls) > (b[col_id].cls-cls)*(b[col_id].cls-cls);
+              return (a[col_id].cls-cls)*(a[col_id].cls-cls) > (b[col_id].cls-cls)*(b[col_id].cls-cls);
             });
 }
 
 size_t Matrix::Split(size_t col_id, size_t low, size_t high, size_t cls) {
-//  CHECK_EQ(fea_type(col_id), FeaType::DISC);
-//  CHECK_LE(high, GetHeight());
-//  CHECK_LT(col_id, GetWidth());
-//  mu.lock();
+  CHECK_EQ(fea_type(col_id), FeaType::DISC);
+  CHECK_LE(high, GetHeight());
+  CHECK_LT(col_id, GetWidth());
   std::sort(data_.begin() + low,
             data_.begin() + high,
             [cls, col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
-                return (a[col_id].cls-cls)*(a[col_id].cls-cls) > (b[col_id].cls-cls)*(b[col_id].cls-cls);
+              return (a[col_id].cls-cls)*(a[col_id].cls-cls) > (b[col_id].cls-cls)*(b[col_id].cls-cls);
             });
   size_t value = data_[high-1][col_id].cls;
   for (size_t i = high-1; i >= low; --i) {
     if (data_[i][col_id].cls != value) return i+1;
   }
-//  mu.unlock();
   return low;
 }
 
@@ -102,7 +97,7 @@ void Matrix::Print(size_t row_num) {
     }
   }
   std::cout << std::endl;
-
+  
   std::cout << "Values:" << std::endl;
   for (size_t i = 0; i < row_num; ++i) {
     for (size_t j = 0; j < width; ++j) {
@@ -128,7 +123,7 @@ void Matrix::Print() {
   unsigned int height = GetHeight();
   std::cout << "width: " << width << std::endl;
   std::cout << "height: " << height << std::endl;
-
+  
   std::cout << "Types:" << std::endl;
   for (size_t i = 0; i < width; ++i) {
     if (fea_type(i) == CONT) {
@@ -143,7 +138,7 @@ void Matrix::Print() {
     }
   }
   std::cout << std::endl;
-
+  
   std::cout << "Values:" << std::endl;
   for (size_t i = 0; i < height; ++i) {
     for (size_t j = 0; j < width; ++j) {
