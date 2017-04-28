@@ -47,7 +47,6 @@ DataProvider::DataProvider(const std::string &file_name) {
   // std::vector<std::thread> threads;
   // for (size_t tid = 0; tid < THREADS_NUM; ++tid){
     // threads.push_back(std::thread([&, this, tid](){
-
       // for (size_t i = tid; i < height; i += THREADS_NUM) {
       for (size_t i = 0; i < height; ++i) {
 
@@ -142,6 +141,13 @@ void DataProvider::get_next_batch_serial(MatrixPtr batch_ptr, size_t batch_size)
 
   if (batch_size + row_index >= height - validation_size) {
     // std::cout << batch_size << ", " << row_index << ", " << batch_size + row_index << std::endl;
+    // std::cout << height << std::endl;
+    // size_t tempLen = indexes_.size();
+    // std::cout << tempLen << std::endl;
+    // for(size_t i = 0; i < 10; ++i) {
+    //   std::cout << indexes_[i] << " ";
+    // }
+    // std::cout << std::endl;
     std::random_shuffle(indexes_.begin(), indexes_.end());
   }
   row_index = (batch_size + row_index) % (height - validation_size); 
@@ -161,17 +167,8 @@ void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size) {
   for (size_t tid = 0; tid < THREADS_NUM; ++tid){
     threads.push_back(std::thread([&, this, tid](){
     for (size_t i = tid; i < batch_size; i += THREADS_NUM) {
-
-
-  // for (size_t i = 0; i < batch_size; ++i) {
-    size_t index = indexes_[(row_index+i) % (height - validation_size)];
-
-    // std::cout << i << ", " << index << std::endl;
-    
-    batch_ptr->Copy(i, sample_ptr_->data((index + row_index) % height));
-  // }
-
-
+      size_t index = indexes_[(row_index+i) % (height - validation_size)];
+      batch_ptr->Copy(i, sample_ptr_->data((index + row_index) % height));
       }
     }));
   }
@@ -181,6 +178,13 @@ void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size) {
 
   if (batch_size + row_index >= height - validation_size) {
     // std::cout << batch_size << ", " << row_index << ", " << batch_size + row_index << std::endl;
+    // std::cout << height << std::endl;
+    // size_t tempLen = indexes_.size();
+    // std::cout << tempLen << std::endl;
+    // for(size_t i = 0; i < 10; ++i) {
+    //   std::cout << indexes_[i] << " ";
+    // }
+    // std::cout << std::endl;
     std::random_shuffle(indexes_.begin(), indexes_.end());
   }
   row_index = (batch_size + row_index) % (height - validation_size); 
