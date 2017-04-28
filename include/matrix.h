@@ -19,7 +19,7 @@ union Value {
 };
 
 class Matrix {
-  std::mutex mu;
+//  std::mutex mu;
 public:
   Matrix() {}
 
@@ -64,13 +64,13 @@ public:
   }
 
   Value operator() (size_t row_id, size_t col_id) {
-    CHECK_LT(row_id, GetHeight()) << "Access: row_id out of bound";
-    CHECK_LT(col_id, GetWidth()) << "Access: col_id out of bound";
+//    CHECK_LT(row_id, GetHeight()) << "Access: row_id out of bound";
+//    CHECK_LT(col_id, GetWidth()) << "Access: col_id out of bound";
     return data_[row_id][col_id];
   }
 
   FeaType fea_type(size_t col_id) {
-    CHECK_LT(col_id, fea_types_.size()) << "Access: feature id out of bound";
+//    CHECK_LT(col_id, fea_types_.size()) << "Access: feature id out of bound";
     return fea_types_[col_id];
   }
 

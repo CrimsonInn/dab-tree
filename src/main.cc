@@ -8,11 +8,12 @@
 #include "trainer.h"
 int main() {
 
-  Trainer trainer("BATCH_DATA_FILE");
-  for (size_t i = 0; i < 40; ++i) {
+  Trainer trainer("/Users/qinlyu/Documents/dab-tree/BATCH_DATA_FILE");
+//  Trainer trainer("BATCH_DATA_FILE");
+  for (size_t i = 0; i < 100; ++i) {
       trainer.TrainOneBatch();
     }
-  trainer.tree.Print();
+//  trainer.tree.Print();
 
   return 0;
 }
