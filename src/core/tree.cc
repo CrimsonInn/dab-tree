@@ -4,8 +4,6 @@
 #include "thread"
 #include <mutex>
 
-const size_t THREAD_NUM = 4;
-
 bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
   size_t sample_num = batch_ptr->GetHeight();
   if (sample_num == 0)
@@ -22,9 +20,8 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
   auto fea_types = split_value_->fea_types();
   
   for (size_t tid = 0; tid < THREAD_NUM; tid++) {
-    threads.push_back(std::thread([&, this, tid](){
-      for (size_t i = 0; i < sample_num; ++i) {
-        if (i % THREAD_NUM != tid) continue;
+    threads.emplace_back(std::thread([&, this, tid](){
+      for (size_t i = tid; i < sample_num; i += THREAD_NUM) {
         for (size_t j = 0; j < NumTrees(); ++j) {
           size_t cur_node = 1;
           while (true) {
@@ -55,8 +52,6 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
   return true;
 }
 
-
-
 void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
   if (cur_node.col_id >= MAX_NODE_SIZE) return;
   if (cur_node.col_id*2 >= MAX_NODE_SIZE) {
@@ -72,18 +67,20 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
   std::vector<size_t> best_split_rows;
   best_split_rows.resize(batch_ptr->GetWidth(), 0);
   
+  size_t MINIMUM_STEP = 5;
+  if (SAMPLENUM_SPLIT*5 < cur_node.high - cur_node.low)
+    MINIMUM_STEP = (cur_node.high - cur_node.low) / SAMPLENUM_SPLIT;
+
   std::vector<std::thread> threads;
   for (size_t tid = 0; tid < THREAD_NUM; ++tid) {
-    threads.push_back(std::thread([&, batch_ptr, tid](){
+    threads.emplace_back(std::thread([&, batch_ptr, tid](){
       
-      for (size_t fea_id = 1; fea_id < batch_ptr->GetWidth(); ++fea_id) {
-        if (fea_id % THREAD_NUM != tid) continue;
+      for (size_t fea_id = tid+1; fea_id < batch_ptr->GetWidth(); fea_id += THREAD_NUM) {
         float best_sse = -1.0;
         Value best_split_value = {.v=0.0};
         size_t best_split_row = 0;
         if (batch_ptr->fea_type(fea_id) == FeaType::DISC) {
-          size_t step = 5;
-          if (cur_node.high - cur_node.low <= step) {
+          if (cur_node.high - cur_node.low <= MINIMUM_STEP) {
             return;
           }
           std::vector<std::pair<float, size_t>> d;
@@ -145,8 +142,7 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
           best_split_rows[fea_id] = best_split_row;
           
         } else if (batch_ptr->fea_type(fea_id) == FeaType::CONT) {
-          size_t step = 5;
-          if (cur_node.high - cur_node.low <= step) {
+          if (cur_node.high - cur_node.low <= MINIMUM_STEP) {
             return;
           }
           std::vector<std::pair<float, float>> d;
@@ -159,8 +155,8 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
           float total_count = 0;
           float total_sum = 0.0;
           float total_ss = 0.0;
-          for (size_t base_row = 0; base_row < d.size(); base_row += step) {
-            for (size_t idx = 0; idx < step; ++idx) {
+          for (size_t base_row = 0; base_row < d.size(); base_row += MINIMUM_STEP) {
+            for (size_t idx = 0; idx < MINIMUM_STEP; ++idx) {
               size_t cur_row = base_row+idx;
               if (cur_row >= d.size()) break;
               total_count += 1;

@@ -7,7 +7,8 @@
 #include "matrix.h"
 
 const size_t MAX_NODE_SIZE = 64;
-const size_t MIN_SAMPLENUM_SPLIT = 100;
+const size_t SAMPLENUM_SPLIT = 100;
+const size_t THREAD_NUM = 4;
 
 struct node {
   size_t row_id;

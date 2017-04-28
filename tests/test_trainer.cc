@@ -4,10 +4,10 @@
 #include <memory>
 
 TEST(TreeTest, TrainOneBatch) {
-//  Trainer trainer("BATCH_DATA_FILE");
-  Trainer trainer("1");
+  Trainer trainer("BATCH_DATA_FILE");
+//  Trainer trainer("1");
 
-  for (size_t i = 0; i < 40; ++i) {
+  for (size_t i = 0; i < 50; ++i) {
       trainer.TrainOneBatch();
     }
 //  trainer.tree.Print();
