@@ -6,7 +6,7 @@
 #include <glog/logging.h>
 // #include "data.h"
 
-const size_t MAX_NODE_SIZE = 64;
+const size_t MAX_NODE_SIZE = 8;
 enum FeaType {
   CONT = 0,
   DISC = 1,

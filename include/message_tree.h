@@ -24,6 +24,11 @@
 #error "cannot determine size_t length"
 #endif
 
+const size_t MESSAGE_TREE_BUNDDLE = 10;
+
+
+
+
 class MessageTree {
 public:
   float weight;
@@ -53,6 +58,14 @@ public:
   }
 };
 
+class MessageTreeBunddle{
+public:
+  MessageTree message_trees[MESSAGE_TREE_BUNDDLE];
+
+};
+
+typedef std::shared_ptr<std::vector<MessageTreeBunddle> > EnsembleMessageTreeBunddlePtr;
+typedef std::shared_ptr<MessageTreeBunddle> MessageTreeBunddlePtr;
 typedef std::shared_ptr<MessageTree> MessageTreePtr;
 typedef std::shared_ptr<std::vector<MessageTreePtr> > EnsembleMessageTreePtr;
 

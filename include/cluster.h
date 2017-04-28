@@ -17,7 +17,9 @@ EnsembleMessageTreePtr Master(int round, int comm_sz, MPI_Datatype &MPI_TREE);
 
 void Worker(int round, int myrank, MPI_Datatype &MPI_TREE);
 
-DLLEXPORT int Dabtree(int round);
+void BunddleMaster(int round, int comm_sz, MPI_Datatype &MPI_TREE);
+void BunddleWorker(int round, int myrank, MPI_Datatype &MPI_TREE);
+DLLEXPORT int Dabtree(int round,bool bunddle=true);
 
 
 #endif
