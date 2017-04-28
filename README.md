@@ -12,6 +12,14 @@ A distributed asynchronous stochastic gradient boosting system will be implement
 ## Performance
 Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with an existing Gradient Boosting Tree library.
 
+## Preliminary results
+Gradient boosting decision tree algorithm was implemented with C++ using serial calculation approach. A preiliminary version of parall algorithm using MPI was also implemented. Initial tests was performed by comparing to training time to existing software packages including GBoost in sklearn and XGBoost. Computation time was listed below. All algorithms achieved similar accuracy.
+Training size (88896, 17) 
+GBoost (sklearn): 31.33 sec
+XGBoost: 14.72 sec
+DabTree: 7.21 sec (preliminary MPI)
+
+
 ## Reference
 1. Wikipedia, https://en.wikipedia.org/wiki/Gradient_boosting
 2. Friedman, Jerome H. "Greedy function approximation: a gradient boosting machine." Annals of statistics (2001): 1189-1232.
