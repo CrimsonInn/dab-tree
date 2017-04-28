@@ -15,11 +15,6 @@ public:
 
   DataProvider() { 
     row_index = 0;
-    int height = sample_ptr_->GetHeight();
-    indexes_.resize(height);
-    for (int i = 0; i < height; ++i) {
-      indexes_[i] = i;
-    }
   }
 
   DataProvider(const std::string &file_name);
@@ -73,6 +68,7 @@ public:
 
 private:
   int row_index;
+  int validation_size;
   std::vector<size_t> indexes_;
   MatrixPtr sample_ptr_ = std::make_shared<Matrix>();
 };
