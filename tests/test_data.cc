@@ -6,7 +6,7 @@
 #include "tree.h"
 
 const int worker_num = 5;
-const bool test_batch = false;
+const bool test_batch = true;
 
 TEST(DataTest, LoadProto) {
 

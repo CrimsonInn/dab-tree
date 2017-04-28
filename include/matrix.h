@@ -134,6 +134,14 @@ public:
     width_ = col_num;
     height_++;
   }
+
+  void set_width(size_t width) {
+    width_ = width;
+  }
+
+  void set_height(size_t height) {
+    height_ = height;
+  }
   
   void Sort(size_t col_id, size_t low, size_t high);
   void Sort(size_t col_id, size_t low, size_t high, size_t cls);
