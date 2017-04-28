@@ -126,6 +126,16 @@ public:
     return message_tree;
   }
 
+  MessageTree GetStackMessageTree(size_t id){
+    MessageTree message_tree ( 
+          id,
+          weight[id],
+          split_fea_.Get(id),
+          split_value_.Get(id)
+      );
+    return message_tree;
+  }
+
   std::string Print(size_t id){
       std::ostringstream s;
 
@@ -146,6 +156,13 @@ public:
     split_fea_.Copy(tree_ptr->id, *(new std::vector<Value>( std::begin(tree_ptr->feas), std::end(tree_ptr->feas))));
     split_value_.Copy(tree_ptr->id, *(new std::vector<Value>( std::begin(tree_ptr->values), std::end(tree_ptr->values))));
     weight[tree_ptr->id] = tree_ptr->weight;
+  }
+
+  void Copy(MessageTree tree){
+    this->Fill(tree.id+1);
+    split_fea_.Copy(tree.id, *(new std::vector<Value>( std::begin(tree.feas), std::end(tree.feas))));
+    split_value_.Copy(tree.id, *(new std::vector<Value>( std::begin(tree.values), std::end(tree.values))));
+    weight[tree.id] = tree.weight;
   }
 
 
