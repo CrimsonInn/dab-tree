@@ -14,12 +14,10 @@ Scalability and efficiency of algorithm will be tested. Training speed and predi
 
 ## Preliminary results
 Gradient boosting decision tree algorithm was implemented with C++ using serial calculation approach. A preiliminary version of parall algorithm using MPI was also implemented. Initial tests was performed by comparing to training time to existing software packages including GBoost in sklearn and XGBoost. Computation time was listed below. All algorithms achieved similar accuracy.
-###Training size (88896, 17) 
-| Method           |    Time    |
-| ---------------- | ----------:|
-| GBoost (sklearn) |  31.33 sec |
-| XGBoost          |  14.72 sec |
-| DabTree (MPI)    |  7.21 sec  |
+    *Training size (88896, 17)
+        *GBoost (sklearn)   31.33 sec
+        *XGBoost            14.72 sec
+        *DabTree(MPI)       7.21 sec
 
 
 ## Reference
