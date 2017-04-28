@@ -15,8 +15,11 @@ public:
     dp = DataProvider(proto_name);
     RegTree tree;
     tree.SetType(dp.get_fea_types());
-    batch_size = 70000;
-    step_size = 0.1;
+    batch_size = 10000;
+    step_size = 1;
+    
+    z = std::make_shared<Matrix>(Matrix());
+    dp.get_next_batch(z, batch_size);
   }
   
   void Validate() {
@@ -41,7 +44,8 @@ public:
   }
   
   void TrainOneBatch() {
-    dp.get_next_batch(batch_ptr, batch_size);
+    MatrixPtr batch_ptr = std::make_shared<Matrix>(Matrix());
+    batch_ptr->Copy(z);
     VectorPtr result_ptr = std::make_shared<std::vector<float>>();
     batch_ptr->SetType(0, FeaType::DISC);
     tree.Predict(batch_ptr, result_ptr);
@@ -85,7 +89,7 @@ public:
     batch_ptr->SetType(0, FeaType::CONT);
     tree.TrainOneTree(batch_ptr, step_size);
     //    if (tree.NumTrees() % 10 == 0) Validate();
-    step_size /= 1;
+    step_size /= 1.1;
   }
   
 private:
@@ -93,4 +97,5 @@ private:
   MatrixPtr batch_ptr = std::make_shared<Matrix>();
   size_t batch_size;
   float step_size;
+  MatrixPtr z;
 };
