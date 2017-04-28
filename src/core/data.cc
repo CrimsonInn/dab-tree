@@ -54,6 +54,10 @@ DataProvider::DataProvider(const std::string &file_name) {
     }
     sample_ptr_->Add(sample);
   }
+
+  sample_ptr_->set_width(width);
+  sample_ptr_->set_height(height);
+
   LOG(INFO) << "Succeed!" ;
 }
 
