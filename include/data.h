@@ -61,6 +61,8 @@ public:
   }
 
   void get_next_batch(MatrixPtr batch_ptr, size_t batch_size);
+  void get_next_batch_serial(MatrixPtr batch_ptr, size_t batch_size);
+
 
   void print_samples(size_t row_num);
 

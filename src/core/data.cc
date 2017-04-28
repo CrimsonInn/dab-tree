@@ -2,6 +2,10 @@
 #include <glog/logging.h>
 #include <algorithm>
 #include <random>
+#include "thread"
+#include <mutex>
+
+const size_t THREADS_NUM = 4;
 
 DataProvider::DataProvider(const std::string &file_name) {
 
@@ -26,6 +30,9 @@ DataProvider::DataProvider(const std::string &file_name) {
   unsigned int width = read_batch_data.width();
   unsigned int height = read_batch_data.height();
 
+  // std::cout << width << std::endl;
+  // std::cout << height << std::endl;
+
   indexes_.resize(height - validation_size);
   for (size_t i = 0; i < height - validation_size; ++i) {
     indexes_[i] = i + validation_size;
@@ -37,23 +44,39 @@ DataProvider::DataProvider(const std::string &file_name) {
   }
   sample_ptr_->SetType(ft);
 
-  for (size_t i = 0; i < height; ++i) {
-    std::vector<Value> sample;
-    // size_t index = indexes_[i];
-    for (size_t j = 0; j < width; ++j) {
-      if (sample_ptr_->fea_type(j) == CONT){
-        sample.push_back({.v = read_batch_data.data(i * width + j).v()});
-      } else if (sample_ptr_->fea_type(j) == DISC) {
-        sample.push_back({.cls = read_batch_data.data(i * width + j).cls()});
-      } else if (sample_ptr_->fea_type(j) == RANK) {
-        sample.push_back({.level = static_cast<int>(read_batch_data.data(i * width + j).level())});
-      } else {
-        LOG(ERROR) << "Protobuf data type error.";
-        return ;
+  // std::vector<std::thread> threads;
+  // for (size_t tid = 0; tid < THREADS_NUM; ++tid){
+    // threads.push_back(std::thread([&, this, tid](){
+
+      // for (size_t i = tid; i < height; i += THREADS_NUM) {
+      for (size_t i = 0; i < height; ++i) {
+
+        // if (i % THREADS_NUM != tid) continue;
+
+        // std::vector<Value> sample = std::vector<Value>(width);
+        std::vector<Value> sample;
+        // size_t index = indexes_[i];
+        for (size_t j = 0; j < width; ++j) {
+          if (ft[j] == CONT){
+            sample.push_back({.v = read_batch_data.data(i * width + j).v()});
+            // sample[j].v = read_batch_data.data(i * width + j).v();
+          } else if (ft[j] == DISC) {
+            sample.push_back({.cls = read_batch_data.data(i * width + j).cls()});
+            // sample[j].cls = read_batch_data.data(i * width + j).cls();
+          } else if (ft[j] == RANK) {
+            sample.push_back({.level = static_cast<int>(read_batch_data.data(i * width + j).level())});
+            // sample[j].level = static_cast<int>(read_batch_data.data(i * width + j).level());
+          } else {
+            LOG(ERROR) << "Protobuf data type error.";
+            return ;
+          }
+        }
+        sample_ptr_->Add(sample);
       }
-    }
-    sample_ptr_->Add(sample);
-  }
+
+  //     }));
+  // }
+  // std::for_each(threads.begin(), threads.end(), mem_fn(&std::thread::join));
 
   sample_ptr_->set_width(width);
   sample_ptr_->set_height(height);
@@ -100,7 +123,47 @@ void DataProvider::print_samples(size_t row_num) {
     }
     std::cout << std::endl;
   }
+
   return ;
+
+}
+
+
+void DataProvider::get_next_batch_serial(MatrixPtr batch_ptr, size_t batch_size) {
+  size_t width = sample_ptr_->GetWidth();
+  batch_ptr->resize(batch_size, width);
+  batch_ptr->SetType(sample_ptr_->fea_types());
+  size_t height = sample_ptr_->GetHeight();
+
+  // std::cout << batch_size << ", " << width << ", " << height << std::endl;
+
+  // std::vector<std::thread> threads;
+  // for (size_t tid = 0; tid < THREADS_NUM; ++tid){
+  //   threads.push_back(std::thread([&, this, tid](){
+  //   for (size_t i = tid; i < batch_size; i += THREADS_NUM) {
+
+
+  for (size_t i = 0; i < batch_size; ++i) {
+    size_t index = indexes_[i];
+
+    // std::cout << i << ", " << index << std::endl;
+    
+    batch_ptr->Copy(i, sample_ptr_->data((index + row_index) % height));
+  }
+
+
+  //     }
+  //   }));
+  // }
+  // std::for_each(threads.begin(), threads.end(), mem_fn(&std::thread::join));
+
+  // std::cout << batch_size << ", " << row_index << ", " << batch_size + row_index << std::endl;
+
+  if (batch_size + row_index >= height) {
+    // std::cout << batch_size << ", " << row_index << ", " << batch_size + row_index << std::endl;
+    std::random_shuffle(indexes_.begin(), indexes_.end());
+  }
+  row_index = (batch_size + row_index) % height; 
 }
 
 
@@ -109,11 +172,29 @@ void DataProvider::get_next_batch(MatrixPtr batch_ptr, size_t batch_size) {
   // batch_ptr = std::make_shared<Matrix>();
   batch_ptr->resize(batch_size, width);
   batch_ptr->SetType(sample_ptr_->fea_types());
-  int height = sample_ptr_->GetHeight();
-  for (size_t i = 0; i < batch_size; ++i) {
+  size_t height = sample_ptr_->GetHeight();
+
+  // std::cout << batch_size << ", " << width << ", " << height << std::endl;
+
+  std::vector<std::thread> threads;
+  for (size_t tid = 0; tid < THREADS_NUM; ++tid){
+    threads.push_back(std::thread([&, this, tid](){
+    for (size_t i = tid; i < batch_size; i += THREADS_NUM) {
+
+
+  // for (size_t i = 0; i < batch_size; ++i) {
     size_t index = indexes_[i];
+
+    // std::cout << i << ", " << index << std::endl;
+    
     batch_ptr->Copy(i, sample_ptr_->data((index + row_index) % height));
+  // }
+
+
+      }
+    }));
   }
+  std::for_each(threads.begin(), threads.end(), mem_fn(&std::thread::join));
 
   // std::cout << batch_size << ", " << row_index << ", " << batch_size + row_index << std::endl;
 

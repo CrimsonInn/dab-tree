@@ -14,8 +14,31 @@ TEST(DataTest, LoadProto) {
     const std::string file_name = "BATCH_DATA_FILE";
     DataProvider data_provider = DataProvider(file_name);
     std::cout << "------- PRINT FIRST THREE ROW --------" << std::endl;
-    data_provider.print_samples(3);
+    // data_provider.print_samples(3);
     std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+    // std::cout << "------- PRINT GET_BATCH_DATA ---------" << std::endl;
+    // MatrixPtr batch_data_ptr = std::make_shared<Matrix>();
+    // data_provider.get_next_batch(batch_data_ptr, 1000);
+    // batch_data_ptr->Print(3);
+    // std::cout << "--------------------------------------" << std::endl;
+    // std::cout << std::endl;
+
+    size_t data_height = data_provider.num_samples();
+    size_t batch_size = 1000;
+    MatrixPtr shuf_batch_data_ptr = std::make_shared<Matrix>();
+    for (size_t i = 0; i < (data_height/batch_size*20 + 1); ++i)
+    {
+      data_provider.get_next_batch(shuf_batch_data_ptr, batch_size);    
+    }
+    std::cout << "---- PRINT SHUFFLED GET_BATCH_DATA ---" << std::endl;
+    // shuf_batch_data_ptr->Print(3);
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+
+
   } else {
     DataProvider data_providers[worker_num];
     for (size_t i = 0; i < worker_num; ++i) {
