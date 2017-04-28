@@ -14,26 +14,50 @@ TEST(DataTest, LoadProto) {
     const std::string file_name = "BATCH_DATA_FILE";
     DataProvider data_provider = DataProvider(file_name);
     std::cout << "------- PRINT FIRST THREE ROW --------" << std::endl;
-    // data_provider.print_samples(3);
+    data_provider.print_samples(3);
     std::cout << "--------------------------------------" << std::endl;
     std::cout << std::endl;
 
-    // std::cout << "------- PRINT GET_BATCH_DATA ---------" << std::endl;
-    // MatrixPtr batch_data_ptr = std::make_shared<Matrix>();
-    // data_provider.get_next_batch(batch_data_ptr, 1000);
-    // batch_data_ptr->Print(3);
-    // std::cout << "--------------------------------------" << std::endl;
-    // std::cout << std::endl;
+    std::cout << "------- PRINT GET_BATCH_DATA ---------" << std::endl;
+    MatrixPtr batch_data_ptr = std::make_shared<Matrix>();
+    data_provider.get_next_batch(batch_data_ptr, 1000);
+    batch_data_ptr->Print(3);
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
 
     size_t data_height = data_provider.num_samples();
     size_t batch_size = 1000;
     MatrixPtr shuf_batch_data_ptr = std::make_shared<Matrix>();
-    for (size_t i = 0; i < (data_height/batch_size*20 + 1); ++i)
+    for (size_t i = 0; i < (data_height/batch_size*10 + 1); ++i)
     {
       data_provider.get_next_batch(shuf_batch_data_ptr, batch_size);    
     }
-    std::cout << "---- PRINT SHUFFLED GET_BATCH_DATA ---" << std::endl;
-    // shuf_batch_data_ptr->Print(3);
+    std::cout << "---- PRINT SHUFFLED GET_BATCH_DATA M---" << std::endl;
+    shuf_batch_data_ptr->Print(3);
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+
+    DataProvider data_provider_s = DataProvider(file_name);
+    std::cout << "------- PRINT FIRST THREE ROW --------" << std::endl;
+    data_provider_s.print_samples(3);
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "------- PRINT GET_BATCH_DATA ---------" << std::endl;
+    MatrixPtr batch_data_ptr_ser = std::make_shared<Matrix>();
+    data_provider_s.get_next_batch_serial(batch_data_ptr_ser, 1000);
+    batch_data_ptr_ser->Print(3);
+    std::cout << "--------------------------------------" << std::endl;
+    std::cout << std::endl;
+
+    MatrixPtr shuf_batch_data_ptr_ser = std::make_shared<Matrix>();
+    for (size_t i = 0; i < (data_height/batch_size*10 + 1); ++i)
+    {
+      data_provider_s.get_next_batch_serial(shuf_batch_data_ptr_ser, batch_size);    
+    }
+    std::cout << "---- PRINT SHUFFLED GET_BATCH_DATA S---" << std::endl;
+    shuf_batch_data_ptr_ser->Print(3);
     std::cout << "--------------------------------------" << std::endl;
     std::cout << std::endl;
 
