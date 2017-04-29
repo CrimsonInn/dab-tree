@@ -74,7 +74,7 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/gtest/src/gtest/googletest/incl
                     "${CMAKE_CURRENT_BINARY_DIR}/gflag/src/gflag-build/include/"
                     )
 
-SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -O3")
+SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11")
 find_package (Threads)
 find_package(Protobuf REQUIRED)
 

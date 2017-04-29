@@ -36,6 +36,7 @@ public:
       float y = (*batch_ptr)(i, 0).cls == 0? -1 : 1;
       float margin = (*result_ptr)[i] * y;
       //      float tmp = margin < 1? 1-margin: 0;
+      if (margin < -5) margin = -5.0;
       float tmp = std::exp(-margin);
       loss += tmp;
       if (margin < 0)
@@ -45,15 +46,13 @@ public:
   }
   
   void TrainOneBatch() {
-    MatrixPtr batch_ptr = std::make_shared<Matrix>(Matrix());
+//    MatrixPtr batch_ptr = std::make_shared<Matrix>(Matrix());
     batch_ptr->Copy(z);
-    dp.get_next_batch(batch_ptr, batch_size);
+//    dp.get_next_batch(batch_ptr, batch_size);
     VectorPtr result_ptr = std::make_shared<std::vector<float>>();
     batch_ptr->SetType(0, FeaType::DISC);
     tree.Predict(batch_ptr, result_ptr);
-    
-//    const size_t THREAD_NUM = 1;
-    
+        
     size_t sample_num = batch_ptr->GetHeight();
     std::vector<std::thread> threads;
     std::vector<float> losses;
@@ -67,15 +66,14 @@ public:
           float y = (*batch_ptr)(i, 0).cls == 0? -1 : 1;
           float margin = (*result_ptr)[i] * y;
           
-                float tmp = margin < 1? 1-margin: 0;
-                if (margin < 1) batch_ptr->SetValue(i, 0, {.v = y});
-                else
-                  batch_ptr->SetValue(i, 0, {.v = 0.0});
-          
-//          float tmp = std::exp(-margin);
-//          batch_ptr->SetValue(i, 0, {.v = y*tmp});
-          
-          
+//                float tmp = margin < 1? 1-margin: 0;
+//                if (margin < 1) batch_ptr->SetValue(i, 0, {.v = y});
+//                else
+//                  batch_ptr->SetValue(i, 0, {.v = 0.0});
+          if (margin < -5) margin = -5.0;
+          float tmp = std::exp(-margin);
+          batch_ptr->SetValue(i, 0, {.v = y*tmp});
+
           losses[tid] += tmp;
           if (margin < 0)
             errs[tid] += 1;
@@ -90,7 +88,7 @@ public:
     LOG(INFO) << "Training Loss=" << loss/sample_num << ", Accuracy=" << 1-err/sample_num;
     batch_ptr->SetType(0, FeaType::CONT);
     tree.TrainOneTree(batch_ptr, step_size);
-    //    if (tree.NumTrees() % 10 == 0) Validate();
+//    if (tree.NumTrees() % 10 == 0) Validate();
 //    step_size /= 1;
   }
   
