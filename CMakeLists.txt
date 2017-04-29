@@ -68,12 +68,11 @@ include_directories(dabtree ${CMAKE_CURRENT_BINARY_DIR}/data)
 
 
 file(GLOB SOURCES
-    src/*.cc
     src/core/*.cc
     src/trainer/*.cc
     src/protobuf/*.cc
     include/*.h
-    src/cluster/*.cc
+
     data/*.proto
 
 )
@@ -89,12 +88,12 @@ if(USE_MPI)
   set(CMAKE_CXX_COMPILER mpicxx)
   set(CMAKE_C_COMPILER mpicc)
   include_directories(${MPI_CXX_INCLUDE_PATH})
-  add_executable(${PROJECT_NAME} src/cluster/cluster.cc ${SOURCES})
-  target_link_libraries(${PROJECT_NAME} libglog proto ${PROTOBUF_LIBRARY} ${MPI_CXX_LIBRARIES})
-else()
-  add_executable(${PROJECT_NAME} ${SOURCES})
-  target_link_libraries(${PROJECT_NAME} libglog proto ${PROTOBUF_LIBRARY})
+  add_executable(cluster src/cluster/cluster.cc ${SOURCES})
+  target_link_libraries(cluster libglog proto ${PROTOBUF_LIBRARY} ${MPI_CXX_LIBRARIES})
 endif()
+  add_executable(${PROJECT_NAME} src/main.cc ${SOURCES})
+  target_link_libraries(${PROJECT_NAME} libglog proto ${PROTOBUF_LIBRARY})
+
 
 
 

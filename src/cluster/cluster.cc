@@ -16,6 +16,22 @@ DLLEXPORT int run(){
     return 0;
 }
 
+int main(int argv, char * args[]) {
+
+
+//  std::string file_name = "BATCH_DATA_FILE";
+//  BatchPtr batch_data = std::make_shared<Batch>();;
+
+//  write_batch_data(batch_data, file_name);
+  //FLAGS_logtostderr = 1;
+  //google::InitGoogleLogging(args[0]);
+  cout << std::stoi(std::string(args[1])) << args[2]<< "\n";
+  bool bunddle = std::string(args[2])=="bunddle"? true:false;
+  Dabtree(std::stoi(std::string(args[1])),bunddle);
+
+  return 0;
+}
+
 #include <time.h>
 #include <sys/time.h>
 double get_wall_time(){
@@ -99,11 +115,11 @@ DLLEXPORT int Dabtree(int round, bool bunddle){
 		else{
 			EnsembleMessageTreePtr tree = Master(round, comm_sz, MPI_TREE);
 			//MPI_Barrier(MPI_COMM_WORLD);
-			cout << "master print trees \n";
+			//cout << "master print trees \n";
 
-			for(auto tr : *tree){
-				cout<<(tr->Print());
-			}
+			//for(auto tr : *tree){
+			//	cout<<(tr->Print());
+			//}
 		}
 		cout << "master success, time "<<get_wall_time()-time<< " \n";
 
@@ -168,10 +184,10 @@ void BunddleMaster(int round, int comm_sz, MPI_Datatype &MPI_TREE){
 		cout << "current count: "<< current_index <<", need "<<total_tree << "\n";
 		
 	}
-	for (int i=0; i<total_tree;i++){
-		cout << "master print trees";
-		cout<<trees[i].Print();
-	}
+	//for (int i=0; i<total_tree;i++){
+	//	cout << "master print trees";
+	//	cout<<trees[i].Print();
+	//}
 	//return trees;
 }
 
@@ -236,24 +252,24 @@ EnsembleMessageTreePtr Master(int round, int comm_sz, MPI_Datatype &MPI_TREE){
 		int remote_count = new_tree->id;
 		int target_rank = stat.MPI_SOURCE;
 
-		cout << "master receive tree from " << target_rank << "\n";
+		LOG(INFO) << "master receive tree from " << target_rank << "\n";
 		
 		new_tree->id = current_index;
 		trees->push_back(new_tree);
 		//new_tree->Print();
 		
 		int send_count = current_index - remote_count + 1;
-		cout << "master send count "<< send_count << " to " << target_rank << "\n";
+		LOG(INFO) << "master send count "<< send_count << " to " << target_rank << "\n";
 		//send tree count here
 		MPI_Ssend(&send_count, 1, MPI_INT, target_rank,0,MPI_COMM_WORLD);
 
 		//for loop to send trees
 		for(int i= remote_count; i<=current_index; i++){
-			cout << "master send tree " << i << " to " << target_rank << "\n";
+			//LOG(INFO) << "master send tree " << i << " to " << target_rank << "\n";
 			MPI_Ssend(trees->at(i).get(), 1, MPI_TREE, target_rank, 0, MPI_COMM_WORLD);
 		}
 		current_index += 1;
-		cout << "current count: "<< current_index <<", need "<<total_tree << "\n";
+		LOG(INFO) << "current count: "<< current_index <<", need "<<total_tree << "\n";
 		
 	}
 	return trees;
@@ -266,32 +282,38 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 	Trainer trainer("BATCH_DATA_FILE");//to_string(myrank));
 	for (int i=0; i<round;i++){
 		//call train local here
-
+		//cout<< "before traing tree on worker "<< myrank << " is "<< trainer.tree.NumTrees()<<" local_index is "<< local_count << "\n";
 		trainer.TrainOneBatch();//TrainLocal();
-		cout<< "tree on worker "<< myrank << " is "<< trainer.tree.NumTrees()<<" local_index is "<< local_count << "\n";
-		//cout<<(trainer.tree.Print(local_count));
+		LOG(INFO)<< "tree on worker "<< myrank << " is "<< trainer.tree.NumTrees()<<" local_index is "<< local_count << "\n";
+		//if(myrank==2) cout<<(trainer.tree.Print(local_count));
 
 		//MessageTreePtr message_tree = vec_tree -> GetMessageTree(local_count);
 		MessageTreePtr message_tree = trainer.tree.GetMessageTree(local_count);
-		cout << "worker "<< myrank << " send tree "<< local_count << "\n";
+		LOG(INFO) << "worker "<< myrank << " send tree "<< local_count << "\n";
 		message_tree ->id=local_count;
 		MPI_Ssend(message_tree.get(), 1, MPI_TREE, 0, 0, MPI_COMM_WORLD);
 
 		int receive_count; 
 		MPI_Recv(&receive_count, 1, MPI_INT, 0,0,MPI_COMM_WORLD, &stat);
-		cout << "worker "<< myrank << " receive count "<< receive_count<< "\n";
+		LOG(INFO) << "worker "<< myrank << " receive count "<< receive_count<< "\n";
 		for (int j=0; j <receive_count; j++){
 			MPI_Recv(message_tree.get(), 1, MPI_TREE, 0,0,MPI_COMM_WORLD, &stat);
-			cout << "worker "<< myrank << " receive tree id "<< message_tree->id << ", " << local_count << "\n";
+			
 			//vec_tree->Copy(message_tree);
+			//if(myrank==2) cout<<message_tree->Print();
 			trainer.tree.Copy(message_tree);
+			//if(myrank==2) cout<<trainer.tree.Print(local_count);
 			//vec_tree->Print(local_count);
-			cout << "worker "<< myrank << " pushed tree"<< "\n";
+			LOG(INFO) << "worker "<< myrank << " receive tree id "<< message_tree->id << ", " << local_count<<", "<< trainer.tree.NumTrees() << "\n";
+			//LOG(INFO) << "worker "<< myrank << " pushed tree"<< "\n";
 			local_count=local_count+1;
 		}
-		cout << "worker "<< myrank <<" round "<<i+1 << "\n";
+		LOG(INFO) << "worker "<< myrank <<" round "<<i+1 << "\n";
 		
 	}
+
+
+
 	return;
 }
 

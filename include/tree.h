@@ -13,7 +13,7 @@
 #include <string>
 
 const size_t SAMPLENUM_SPLIT = 100;
-const size_t THREAD_NUM = 4;
+const size_t THREAD_NUM = 1;
 
 
 struct node {
@@ -86,8 +86,8 @@ public:
 
   void Fill(int numTree){
     for (int i = this->NumTrees(); i<numTree; i++){
-      split_fea_->AddZero();
-      split_value_->AddZero();
+      split_fea_->AddOneRow(MAX_NODE_SIZE);
+      split_value_->AddOneRow(MAX_NODE_SIZE);
       weight.push_back(1);
     }
   }
@@ -159,6 +159,7 @@ public:
   }
 
   void Copy(MessageTreePtr tree_ptr) {
+
     this->Fill(tree_ptr->id+1);
     split_fea_->Copy(tree_ptr->id, *(new std::vector<Value>( std::begin(tree_ptr->feas), std::end(tree_ptr->feas))));
     split_value_->Copy(tree_ptr->id, *(new std::vector<Value>( std::begin(tree_ptr->values), std::end(tree_ptr->values))));
