@@ -6,6 +6,7 @@
 #include <string>
 #include <cmath>
 #include <thread>
+#include <algorithm>
 
 class Trainer {
 public:
