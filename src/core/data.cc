@@ -5,9 +5,8 @@
 #include "thread"
 #include <mutex>
 
-const size_t THREADS_NUM = 4;
 
-DataProvider::DataProvider(const std::string &file_name) {
+DataProvider::DataProvider(const std::string &file_name, size_t tn) {
 
   // Verify that the version of the protobuf that we linked against is
   // compatible with the version of the headers we compiled against.
@@ -18,6 +17,7 @@ DataProvider::DataProvider(const std::string &file_name) {
   LOG(INFO) << "Begin read protobuf file " << file_name << " ..." ;
   rawdata::Matrix read_batch_data;
 
+  THREADS_NUM = tn;
   // Read the existing address book.
   std::fstream input(file_name, std::ios::in | std::ios::binary);
   if (!input) {

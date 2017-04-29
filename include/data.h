@@ -12,12 +12,13 @@
 
 class DataProvider {
 public:
+  size_t THREADS_NUM;
 
   DataProvider() { 
     row_index = 0;
   }
 
-  DataProvider(const std::string &file_name);
+  DataProvider(const std::string &file_name, size_t tn=1);
 
   size_t num_samples() {
     return sample_ptr_->GetHeight();

@@ -3,7 +3,7 @@
 #include <memory>
 #include "data.h"
 #include "tree.h"
-
+const size_t MAX_NODE_SIZE = 64;
 
 TEST(TreeTest, OneTreePredict) {
   RegTreePtr tree = std::make_shared<RegTree>();

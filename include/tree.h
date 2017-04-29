@@ -6,10 +6,6 @@
 #include "data.h"
 #include "matrix.h"
 
-const size_t MAX_NODE_SIZE = 64;
-const size_t SAMPLENUM_SPLIT = 100;
-const size_t THREAD_NUM = 4;
-
 struct node {
   size_t row_id;
   size_t col_id;
@@ -24,7 +20,15 @@ struct node {
  */
 class RegTree {
 public:
-  RegTree() {
+  size_t MAX_NODE_SIZE;
+  size_t SAMPLENUM_SPLIT;
+  size_t THREAD_NUM;
+
+  RegTree(size_t thread_num=4, size_t splits=100, size_t max_node_size=64) {
+    SAMPLENUM_SPLIT = splits;
+    THREAD_NUM = thread_num;
+    MAX_NODE_SIZE = max_node_size;
+
     split_fea_ = std::make_shared<Matrix>();
     split_value_ = std::make_shared<Matrix>();
     split_fea_->Create(MAX_NODE_SIZE, 0, FeaType::DISC);
