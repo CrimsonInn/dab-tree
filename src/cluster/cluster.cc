@@ -45,7 +45,7 @@ double get_wall_time(){
 
 void DeclareMessageTree(MPI_Datatype &MPI_TREE){
 	MPI_Datatype types[4]={MPI_FLOAT, my_MPI_SIZE_T, my_MPI_SIZE_T, my_MPI_SIZE_T};
-	int bls[4] = {1, 1, MAX_NODE_SIZE, MAX_NODE_SIZE};
+	int bls[4] = {1, 1, tmp_MAX_NODE_SIZE, tmp_MAX_NODE_SIZE};
 	MPI_Aint disps[4];
 	disps[0]=0;
 	disps[1]=offsetof(MessageTree,id);
@@ -70,8 +70,8 @@ void DeclareMessageTreeBunddle(MPI_Datatype &MPI_TREE){
 		types[4*i+3]=my_MPI_SIZE_T;
 		bls[4*i] = 1;
 		bls[4*i+1] = 1;
-		bls[4*i+2] = MAX_NODE_SIZE;
-		bls[4*i+3] = MAX_NODE_SIZE;
+		bls[4*i+2] = tmp_MAX_NODE_SIZE;
+		bls[4*i+3] = tmp_MAX_NODE_SIZE;
 		disps[4*i]=0;
 		disps[4*i+1]=offsetof(MessageTree,id);
 		disps[4*i+2]=offsetof(MessageTree,feas);

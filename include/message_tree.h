@@ -26,15 +26,13 @@
 
 const size_t MESSAGE_TREE_BUNDDLE = 10;
 
-
-
-
+const size_t tmp_MAX_NODE_SIZE = 64;
 class MessageTree {
 public:
   float weight;
   size_t id;
-  Value feas[MAX_NODE_SIZE];
-  Value values[MAX_NODE_SIZE];
+  Value feas[tmp_MAX_NODE_SIZE];
+  Value values[tmp_MAX_NODE_SIZE];
   MessageTree()=default;
   MessageTree(size_t id, float weight, const std::vector<Value>& feas, const std::vector<Value>& values) {
     this->id=id;
@@ -49,10 +47,10 @@ public:
     s << "id: " << id << "\n";
     s << "weight: " << weight << "\n";
     s << "feas: ";
-    for (int i=0; i< MAX_NODE_SIZE; i++){s<< feas[i].v<<", ";}
+    for (int i=0; i< tmp_MAX_NODE_SIZE; i++){s<< feas[i].v<<", ";}
     s << "\n";
     s << "values: ";
-    for (int i=0; i< MAX_NODE_SIZE; i++){s << values[i].v<<", ";}
+    for (int i=0; i< tmp_MAX_NODE_SIZE; i++){s << values[i].v<<", ";}
     s << "\n done ---------------- \n \n";
     return s.str();
   }
