@@ -73,7 +73,7 @@
 
 // }
 
-
+/*
 bool write_matrix_data(MatrixPtr matrixptr, rawdata::Matrix* write_matrix) {
 
   LOG(INFO) << "Begin write rawdata matrix ...";
@@ -185,7 +185,7 @@ bool write_batch_data(BatchPtr batch_data_ptr, const std::string& file_name) {
   return true;
 
 }
-
+*/
 
 // bool write_matrix_data(MatrixPtr matrixptr, dabtree::Matrix write_matrix) {
 

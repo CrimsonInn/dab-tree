@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.5)
 set(CMAKE_C_COMPILER "gcc")
 set(CMAKE_CXX_COMPILER "g++")
 
+if(USE_OPENMP)
+FIND_PACKAGE( OpenMP REQUIRED)
+message("USE OPENMP")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 project(dabtree)
 # Enable ExternalProject CMake module
 include(ExternalProject)
@@ -44,13 +51,30 @@ set_target_properties(libglog PROPERTIES
     "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
 )
 
+ExternalProject_Add(
+    gflag
+    GIT_REPOSITORY "https://github.com/gflags/gflags.git"
+    PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gflag
+    # Disable install step
+    INSTALL_COMMAND ""
+)
+ExternalProject_Get_Property(gflag source_dir binary_dir)
+add_library(libgflag IMPORTED STATIC GLOBAL)
+add_dependencies(libgflag gflag)
+set_target_properties(libgflag PROPERTIES
+    "IMPORTED_LOCATION" "${binary_dir}/lib/libgflags.a"
+    "IMPORTED_LINK_INTERFACE_LIBRARIES" "${CMAKE_THREAD_LIBS_INIT}"
+)
+
+
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/gtest/src/gtest/googletest/include"
                     "${CMAKE_CURRENT_BINARY_DIR}/gtest/src/gtest/googlemock/include"
                     "${CMAKE_CURRENT_BINARY_DIR}/glog/src/glog-build/"
                     "${CMAKE_CURRENT_BINARY_DIR}/glog/src/glog/src/"
+                    "${CMAKE_CURRENT_BINARY_DIR}/gflag/src/gflag-build/include/"
                     )
 
-SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -pthread -g -Wall")
+SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11 -O3")
 find_package (Threads)
 find_package(Protobuf REQUIRED)
 
@@ -73,10 +97,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} libglog proto ${PROTOBUF_LIBRARY})
+target_link_libraries(${PROJECT_NAME} libglog proto libgflag ${PROTOBUF_LIBRARY})
 
 #add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/protobuf/read_proto.cc src/protobuf/write_proto.cc)
-add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/core/matrix.cc)
+#add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/core/matrix.cc src/trainer/trainer.cc src/core/data.cc)
+add_library (dabcore STATIC ${SOURCES})
 
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
