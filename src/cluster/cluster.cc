@@ -8,16 +8,18 @@
 #include <cstring>
 #include <glog/logging.h>
 #include <stdexcept>
+#include <gflags/gflags.h>
 
-
+DEFINE_int64(round, 50 ,"round");
+DEFINE_bool(bundle, true, "bundle");
 // this is only a test of python interface
 DLLEXPORT int run(){
     cout << "success \n";
     return 0;
 }
 
-int main(int argv, char * args[]) {
-
+int main(int argc, char** argv) {
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
 
 //  std::string file_name = "BATCH_DATA_FILE";
 //  BatchPtr batch_data = std::make_shared<Batch>();;
@@ -25,9 +27,9 @@ int main(int argv, char * args[]) {
 //  write_batch_data(batch_data, file_name);
   //FLAGS_logtostderr = 1;
   //google::InitGoogleLogging(args[0]);
-  cout << std::stoi(std::string(args[1])) << args[2]<< "\n";
-  bool bunddle = std::string(args[2])=="bunddle"? true:false;
-  Dabtree(std::stoi(std::string(args[1])),bunddle);
+//  cout << std::stoi(std::string(args[1])) << args[2]<< "\n";
+//  bool bunddle = std::string(args[2])=="bunddle"? true:false;
+  Dabtree(FLAGS_round, FLAGS_bundle);
 
   return 0;
 }
