@@ -3,29 +3,7 @@
 #include <memory>
 #include "data.h"
 #include "tree.h"
-
-TEST(TreeTest, TrainOneBatch) {
-  RegTreePtr tree = std::make_shared<RegTree>();
-  tree->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
-
-  MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));
-  batch->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
-  batch->Copy(0, {{.v=0.1}, {.v=1}, {.cls=0}, {.level=2}});
-  batch->Copy(1, {{.v=0.2}, {.v=1}, {.cls=0}, {.level=0}});
-  batch->Copy(2, {{.v=0.3}, {.v=0.4}, {.cls=0}, {.level=0}});
-  batch->Copy(3, {{.v=0.4}, {.v=0.4}, {.cls=1}, {.level=0}});
-
-  tree->TrainOneTree(batch, 1.0);
-  tree->Print();
-
-//  VectorPtr result = std::make_shared<std::vector<float>>();
-//  tree->Predict(batch, result);
-//  ASSERT_FLOAT_EQ(0.7, (*result)[0]);
-//  ASSERT_FLOAT_EQ(0.6, (*result)[1]);
-//  ASSERT_FLOAT_EQ(0.5, (*result)[2]);
-//  ASSERT_FLOAT_EQ(0.4, (*result)[3]);
-}
-
+const size_t MAX_NODE_SIZE = 64;
 
 TEST(TreeTest, OneTreePredict) {
   RegTreePtr tree = std::make_shared<RegTree>();
@@ -37,9 +15,10 @@ TEST(TreeTest, OneTreePredict) {
                                {.v=0.4}, {.v=0.5}, {.v=0.6}, {.v=0.7}};
   values.resize(MAX_NODE_SIZE, {.v=0.0});
   tree->AddOneTree(feas, values);
-  tree->Print();
+//  tree->Print();
 
-  MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));
+  MatrixPtr batch = std::make_shared<Matrix>();
+  batch->Create(4, 4);
   batch->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
   batch->Copy(0, {{.v=0.0}, {.v=1}, {.cls=0}, {.level=2}});
   batch->Copy(1, {{.v=0.0}, {.v=1}, {.cls=0}, {.level=0}});
@@ -50,7 +29,7 @@ TEST(TreeTest, OneTreePredict) {
   tree->Predict(batch, result);
   ASSERT_FLOAT_EQ(0.7, (*result)[0]);
   ASSERT_FLOAT_EQ(0.6, (*result)[1]);
-  ASSERT_FLOAT_EQ(0.5, (*result)[2]);
+  ASSERT_FLOAT_EQ(0.75, (*result)[2]);
   ASSERT_FLOAT_EQ(0.4, (*result)[3]);
 }
 
@@ -65,10 +44,11 @@ TEST(TreeTest, EnsemblePredict) {
   values.resize(MAX_NODE_SIZE, {.v=0.0});
   tree->AddOneTree(feas, values);
   tree->AddOneTree(feas, values, 0.5);
-  tree->Print();
+//  tree->Print();
 
 
-  MatrixPtr batch = std::make_shared<Matrix>(Matrix(4, 4));
+  MatrixPtr batch = std::make_shared<Matrix>();
+  batch->Create(4, 4);
   batch->SetType({FeaType::CONT, FeaType::CONT, FeaType::DISC, FeaType::RANK});
   batch->Copy(0, {{.v=0.0}, {.v=1}, {.cls=0}, {.level=2}});
   batch->Copy(1, {{.v=0.0}, {.v=1}, {.cls=0}, {.level=0}});

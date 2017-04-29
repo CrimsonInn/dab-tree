@@ -4,13 +4,14 @@ DIR_DATA_SRC = ./data
 DIR_DATA_DST = ./include
 DIR_INC = ./include
 DIR_PROTO_SRC = ./src/protobuf
+DIR_CORE_SRC = ./src/core
 DIR_SRC = ./src
 DIR_BUILD = ./build
 
 CC = c++
 CFLAGS = -std=gnu++11 `pkg-config --cflags --libs protobuf` -lglog
 
-objects = $(DIR_BUILD)/main.o $(DIR_BUILD)/write_proto.o $(DIR_BUILD)/read_proto.o\
+objects = $(DIR_BUILD)/main.o $(DIR_BUILD)/data.o $(DIR_BUILD)/matrix.o $(DIR_BUILD)/write_proto.o $(DIR_BUILD)/read_proto.o\
 		  $(DIR_INC)/data.pb.cc $(DIR_INC)/tree.pb.cc $(DIR_INC)/matrix.pb.cc 
 
 .PHONY: all
@@ -27,6 +28,12 @@ output: $(objects) proto
 
 $(DIR_BUILD)/main.o: $(DIR_SRC)/main.cc $(DIR_INC)/*.h
 	$(CC) -std=gnu++11 -c -I$(DIR_INC) $(DIR_SRC)/main.cc -o $(DIR_BUILD)/main.o
+
+$(DIR_BUILD)/data.o: $(DIR_CORE_SRC)/data.cc $(DIR_INC)/*.h
+	$(CC) -std=gnu++11 -c -I$(DIR_INC) $(DIR_CORE_SRC)/data.cc -o $(DIR_BUILD)/data.o
+
+$(DIR_BUILD)/matrix.o: $(DIR_CORE_SRC)/matrix.cc $(DIR_INC)/*.h
+	$(CC) -std=gnu++11 -c -I$(DIR_INC) $(DIR_CORE_SRC)/matrix.cc -o $(DIR_BUILD)/matrix.o
 
 $(DIR_BUILD)/write_proto.o: $(DIR_PROTO_SRC)/write_proto.cc $(DIR_INC)/*.h
 	$(CC) -std=gnu++11 -c -I$(DIR_INC) $(DIR_PROTO_SRC)/write_proto.cc -o $(DIR_BUILD)/write_proto.o
@@ -45,4 +52,3 @@ _PRE:
 .PHONY: clean
 clean:
 	rm -fr build
-
