@@ -23,5 +23,6 @@ int main(int argc, char** argv) {
   }
 //    trainer.tree.Print();
   gflags::ShutDownCommandLineFlags();
+
   return 0;
 }

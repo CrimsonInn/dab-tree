@@ -6,6 +6,7 @@
 #include <glog/logging.h>
 #include <mutex>
 
+const size_t MAX_NODE_SIZE = 64;
 enum FeaType {
   CONT = 0,
   DISC = 1,
@@ -112,8 +113,18 @@ public:
     width_ = values[0].size();
     height_ = values.size();
   }
-  
-  
+
+  std::vector<Value>& Get(size_t row_id = -1){
+    if (row_id== -1){
+      row_id = this->GetHeight();
+    }
+    return data_[row_id];
+  }
+
+  void AddZero(){
+    data_.push_back(std::vector<Value>(MAX_NODE_SIZE, {.v=0.0}));
+  }
+
   void Copy(std::shared_ptr<Matrix> m) {
     data_ = m->data();
     fea_types_ = m->fea_types();

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
-set(CMAKE_C_COMPILER "gcc")
-set(CMAKE_CXX_COMPILER "g++")
+#set(CMAKE_C_COMPILER "gcc")
+#set(CMAKE_CXX_COMPILER "g++")
 
 if(USE_OPENMP)
 FIND_PACKAGE( OpenMP REQUIRED)
@@ -14,7 +14,8 @@ project(dabtree)
 include(ExternalProject)
 ExternalProject_Add(
     gtest
-    URL https://github.com/google/googletest/archive/master.zip
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    #URL https://github.com/google/googletest/archive/master.zip
     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/gtest
     # Disable install step
     INSTALL_COMMAND ""
@@ -84,24 +85,42 @@ include_directories(dabtree ${CMAKE_CURRENT_BINARY_DIR}/data)
 
 
 file(GLOB SOURCES
-    src/*.cc
     src/core/*.cc
     src/trainer/*.cc
     src/protobuf/*.cc
     include/*.h
+
     data/*.proto
+
 )
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 
-add_executable(${PROJECT_NAME} ${SOURCES})
-target_link_libraries(${PROJECT_NAME} libglog proto libgflag ${PROTOBUF_LIBRARY})
+
+
+
+if(USE_MPI)
+  find_package(MPI)
+  set(CMAKE_CXX_COMPILER mpicxx)
+  set(CMAKE_C_COMPILER mpicc)
+  include_directories(${MPI_CXX_INCLUDE_PATH})
+  add_executable(cluster src/cluster/cluster.cc ${SOURCES})
+  target_link_libraries(cluster libglog proto ${PROTOBUF_LIBRARY} ${MPI_CXX_LIBRARIES})
+endif()
+  add_executable(${PROJECT_NAME} src/main.cc ${SOURCES})
+  target_link_libraries(${PROJECT_NAME} libglog proto libgflag ${PROTOBUF_LIBRARY})
+
+
 
 #add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/protobuf/read_proto.cc src/protobuf/write_proto.cc)
 #add_library (dabcore STATIC src/core/data.cc src/core/tree.cc src/core/matrix.cc src/trainer/trainer.cc src/core/data.cc)
 add_library (dabcore STATIC ${SOURCES})
 
+
+
+
 ADD_SUBDIRECTORY(tests)
 ADD_SUBDIRECTORY(data)
+

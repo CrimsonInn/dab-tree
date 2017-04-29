@@ -22,6 +22,7 @@ public:
     
     z = std::make_shared<Matrix>(Matrix());
     dp.get_next_batch(z, batch_size);
+
   }
   
   void Validate() {
