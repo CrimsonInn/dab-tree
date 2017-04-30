@@ -12,11 +12,18 @@
 
 DEFINE_int64(round, 50 ,"round");
 DEFINE_bool(bundle, true, "bundle");
+DEFINE_double(lr, 1.0, "learning rate");
+DEFINE_uint64(batch, 10000, "batch size");
+DEFINE_string(train, "BATCH_DATA_FILE", "training data file");
+DEFINE_uint64(threads, 1, "thread num");
+DEFINE_uint64(splits, 100, "splits num for continuous feature");
+DEFINE_uint64(nodes, 64, "tree node num");
 // this is only a test of python interface
 DLLEXPORT int run(){
     cout << "success \n";
     return 0;
 }
+
 
 int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -197,7 +204,7 @@ void BunddleWorker(int round, int myrank, MPI_Datatype &MPI_TREE){
 	int local_count=0;
 	MPI_Status stat;
 	//RegTreePtr vec_tree(new RegTree);
-	Trainer trainer("BATCH_DATA_FILE");//to_string(myrank));
+	Trainer trainer("BATCH_DATA_FILE", FLAGS_batch, FLAGS_lr, FLAGS_threads, FLAGS_splits, FLAGS_nodes);//to_string(myrank));
 	MessageTree message_buffer [MESSAGE_TREE_BUNDDLE];
 	for (int i=0; i<round/MESSAGE_TREE_BUNDDLE;i++){
 		//call train local here
@@ -281,7 +288,7 @@ void Worker(int round, int myrank, MPI_Datatype &MPI_TREE){
 	int local_count=0;
 	MPI_Status stat;
 	//RegTreePtr vec_tree(new RegTree);
-	Trainer trainer("BATCH_DATA_FILE");//to_string(myrank));
+	Trainer trainer("BATCH_DATA_FILE", FLAGS_batch, FLAGS_lr, FLAGS_threads, FLAGS_splits, FLAGS_nodes);//to_string(myrank));
 	for (int i=0; i<round;i++){
 		//call train local here
 		//cout<< "before traing tree on worker "<< myrank << " is "<< trainer.tree.NumTrees()<<" local_index is "<< local_count << "\n";
