@@ -44,7 +44,7 @@ public:
       if (margin < 0)
         err += 1;
     }
-    LOG(INFO) << "Validation Loss=" << loss/result_ptr->size() << ", Accuracy=" << 1-err*1.0/result_ptr->size();
+    std::cout << "Validation Loss=" << loss/result_ptr->size() << ", Accuracy=" << 1-err*1.0/result_ptr->size();
   }
   
   void TrainOneBatch() {
@@ -87,7 +87,7 @@ public:
     float err = 0;
     for (auto l : losses) loss += l;
     for (auto e : errs) err += e;
-    LOG(INFO) << "Training Loss=" << loss/sample_num << ", Accuracy=" << 1-err/sample_num;
+    std::cout << "Training Loss=" << loss/sample_num << ", Accuracy=" << 1-err/sample_num;
     batch_ptr->SetType(0, FeaType::CONT);
     tree.TrainOneTree(batch_ptr, step_size);
 //    if (tree.NumTrees() % 10 == 0) Validate();

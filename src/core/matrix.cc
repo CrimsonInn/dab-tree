@@ -1,7 +1,7 @@
 #include <algorithm>
 #include "matrix.h"
 #include <iostream>
-#include <glog/logging.h>
+
 
 void Matrix::Sort(size_t col_id, size_t low, size_t high) {
   FeaType type = fea_type(col_id);
@@ -34,9 +34,9 @@ void Matrix::Sort(size_t col_id, size_t low, size_t high, size_t cls) {
 }
 
 size_t Matrix::Split(size_t col_id, size_t low, size_t high, size_t cls) {
-  CHECK_EQ(fea_type(col_id), FeaType::DISC);
-  CHECK_LE(high, GetHeight());
-  CHECK_LT(col_id, GetWidth());
+  //CHECK_EQ(fea_type(col_id), FeaType::DISC);
+  //CHECK_LE(high, GetHeight());
+  //CHECK_LT(col_id, GetWidth());
   std::sort(data_.begin() + low,
             data_.begin() + high,
             [cls, col_id](const std::vector<Value>& a, const std::vector<Value>& b) {
@@ -51,7 +51,7 @@ size_t Matrix::Split(size_t col_id, size_t low, size_t high, size_t cls) {
 
 float Matrix::ColMean(size_t col_id, size_t low, size_t high) {
   FeaType type = fea_type(col_id);
-  CHECK_EQ(type, FeaType::CONT);
+  //CHECK_EQ(type, FeaType::CONT);
   if (high <= low) return 0.0;
   float result = 0.0;
   for (size_t row_id = low; row_id < high; ++row_id)
@@ -61,7 +61,7 @@ float Matrix::ColMean(size_t col_id, size_t low, size_t high) {
 
 float Matrix::SSE(size_t low, size_t high) {
   FeaType type = fea_type(0);
-  CHECK_EQ(type, FeaType::CONT);
+  //CHECK_EQ(type, FeaType::CONT);
   if (high <= low) return 0.0;
   float mean = ColMean(0, low, high);
   float result = 0.0;
@@ -76,9 +76,9 @@ float Matrix::SSE(size_t low, size_t high) {
 
 void Matrix::Print(size_t row_num) {
   unsigned int height = data_.size();
-  CHECK_LT(0, height) << "Access: empty data";
+  //CHECK_LT(0, height) << "Access: empty data";
   unsigned int width_fea = fea_types_.size();
-  CHECK_LT(0, width_fea) << "Access: empty fea_types";
+  //CHECK_LT(0, width_fea) << "Access: empty fea_types";
   unsigned int width = data_[0].size();
   std::cout << "width: " << width << std::endl;
   std::cout << "height: " << height << std::endl;
@@ -92,7 +92,7 @@ void Matrix::Print(size_t row_num) {
     } else if (fea_type(i) == RANK) {
       std::cout << "RANK" << " ";
     } else {
-      LOG(ERROR) << "Data type error.";
+      std::cout << "Data type error.";
       return ;
     }
   }
@@ -108,7 +108,7 @@ void Matrix::Print(size_t row_num) {
       } else if (fea_type(j) == RANK) {
         std::cout << "level: " << data_[i][j].level << " ";
       } else {
-        LOG(ERROR) << "Data type error.";
+        std::cout << "Data type error.";
         return ;
       }
     }
@@ -133,7 +133,7 @@ void Matrix::Print() {
     } else if (fea_type(i) == RANK) {
       std::cout << "RANK" << " ";
     } else {
-      LOG(ERROR) << "Data type error.";
+      std::cout << "Data type error.";
       return ;
     }
   }
@@ -149,7 +149,7 @@ void Matrix::Print() {
       } else if (fea_type(j) == RANK) {
         std::cout << "level: " << data_[i][j].level << " ";
       } else {
-        LOG(ERROR) << "Data type error.";
+        std::cout << "Data type error.";
         return ;
       }
     }

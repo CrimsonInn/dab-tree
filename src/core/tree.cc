@@ -1,6 +1,5 @@
 #include "tree.h"
 #include <algorithm>
-#include <glog/logging.h>
 #include "thread"
 #include <mutex>
 
@@ -32,7 +31,7 @@ bool RegTree::Predict(MatrixPtr batch_ptr, VectorPtr result_ptr) {
               break;
             }
             FeaType cur_type = fea_types[cur_fea];
-            CHECK_EQ(cur_type, batch.fea_type(cur_fea)) << "types not match";
+            //CHECK_EQ(cur_type, batch.fea_type(cur_fea)) << "types not match";
             Value sample_value = batch(i, cur_fea);
             cur_node = cur_node*2;
             if (cur_type == FeaType::CONT && sample_value.v >= cur_value.v) {
@@ -184,7 +183,7 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
           best_split_rows[fea_id] = best_split_row;
           
         } else if (batch_ptr->fea_type(fea_id) == FeaType::RANK) {
-          LOG(ERROR) << "Rank feature currently not supported";
+          std::cout << "Rank feature currently not supported";
           return;
         }
       }// inner for loop
@@ -247,11 +246,11 @@ void RegTree::GrowNode(MatrixPtr batch_ptr, node cur_node) {
 void RegTree::TrainOneTree(MatrixPtr batch_ptr, float weight) {
   if (split_value_->Empty()) {
     split_value_->SetType(batch_ptr->fea_types());
-  } else {
-    for (size_t i = 0; i < batch_ptr->GetWidth(); ++i) {
-      CHECK_EQ(batch_ptr->fea_type(i), split_type(i));
-    }
-  }
+  } //else {
+    //for (size_t i = 0; i < batch_ptr->GetWidth(); ++i) {
+     // CHECK_EQ(batch_ptr->fea_type(i), split_type(i));
+    //}
+  //}
   AddOneTree(weight);
   size_t row_id = NumTrees()-1;
   node root = {.row_id=row_id, .col_id=1, .low = 0, .high=batch_ptr->GetHeight()};

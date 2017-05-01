@@ -1,5 +1,4 @@
 #include "data.h"
-#include <glog/logging.h>
 #include <algorithm>
 #include <random>
 #include "thread"
@@ -32,13 +31,13 @@ DataProvider::DataProvider(const std::string &file_name, size_t tn) {
         sample.push_back({.v = 1.});
         // sample[j].v = read_batch_data.data(i * width + j).v();
       } else if (ft[j] == DISC) {
-        sample.push_back({.cls = 2.});
+        sample.push_back({.cls = 2});
         // sample[j].cls = read_batch_data.data(i * width + j).cls();
       } else if (ft[j] == RANK) {
-        sample.push_back({.level = 3.});
+        sample.push_back({.level = 3});
         // sample[j].level = static_cast<int>(read_batch_data.data(i * width + j).level());
       } else {
-        LOG(ERROR) << "Protobuf data type error.";
+        std::cout << "Protobuf data type error.";
         return ;
       }
     }
@@ -56,17 +55,17 @@ DataProvider::DataProvider(const std::string &file_name, size_t tn) {
   // GOOGLE_PROTOBUF_VERIFY_VERSION;
   // row_index = 0;
   // validation_size = 1000;
-  // LOG(INFO) << "Init DataProvider ..." ;
-  // LOG(INFO) << "Begin read protobuf file " << file_name << " ..." ;
+  // std::cout << "Init DataProvider ..." ;
+  // std::cout << "Begin read protobuf file " << file_name << " ..." ;
   // rawdata::Matrix read_batch_data;
 
   // THREADS_NUM = tn;
   // // Read the existing address book.
   // std::fstream input(file_name, std::ios::in | std::ios::binary);
   // if (!input) {
-  //   LOG(INFO) << file_name << ": File not found. Creating a new file.";
+  //   std::cout << file_name << ": File not found. Creating a new file.";
   // } else if (!read_batch_data.ParseFromIstream(&input)) {
-  //   LOG(ERROR) << "Failed to parse protobuf file.";
+  //   std::cout << "Failed to parse protobuf file.";
   //   return ;
   // }
 
@@ -109,7 +108,7 @@ DataProvider::DataProvider(const std::string &file_name, size_t tn) {
   //           sample.push_back({.level = static_cast<int>(read_batch_data.data(i * width + j).level())});
   //           // sample[j].level = static_cast<int>(read_batch_data.data(i * width + j).level());
   //         } else {
-  //           LOG(ERROR) << "Protobuf data type error.";
+  //           std::cout << "Protobuf data type error.";
   //           return ;
   //         }
   //       }
@@ -123,7 +122,7 @@ DataProvider::DataProvider(const std::string &file_name, size_t tn) {
   // sample_ptr_->set_width(width);
   // sample_ptr_->set_height(height);
 
-  // LOG(INFO) << "Succeed!" ;
+  // std::cout << "Succeed!" ;
 }
 
 
@@ -142,7 +141,7 @@ void DataProvider::print_samples(size_t row_num) {
     } else if (sample_ptr_->fea_type(i) == RANK) {
       std::cout << "RANK" << " ";
     } else {
-      LOG(ERROR) << "Data type error.";
+      std::cout << "Data type error.";
       return ;
     }
   }
@@ -159,7 +158,7 @@ void DataProvider::print_samples(size_t row_num) {
       } else if (sample_ptr_->fea_type(j) == RANK) {
         std::cout << "level: " << (*sample_ptr_)(i, j).level << " ";
       } else {
-        LOG(ERROR) << "Data type error.";
+        std::cout << "Data type error.";
         return ;
       }
     }
@@ -243,7 +242,7 @@ MatrixPtr DataProvider::get_validation(size_t vali_size) {
   vali_ptr->SetType(sample_ptr_->fea_types());
   int height = sample_ptr_->GetHeight();
   if (vali_size > height) {
-    LOG(ERROR) << "Demand validation data size too large." ;
+    std::cout << "Demand validation data size too large." ;
     return NULL;
   }
   for (size_t i = 0; i < vali_size; ++i) {

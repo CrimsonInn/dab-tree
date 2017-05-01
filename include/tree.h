@@ -7,7 +7,6 @@
 #include "data.h"
 #include "message_tree.h"
 #include "matrix.h"
-#include <glog/logging.h>
 #include <sstream> 
 #include <string>
 
@@ -67,7 +66,7 @@ public:
             const std::vector<Value>& feas,
             const std::vector<Value>& values,
             float w=1.0) {
-    CHECK_LT(row_id, NumTrees()) << "(Tree) Copy: row_id out of bound";
+    //CHECK_LT(row_id, NumTrees()) << "(Tree) Copy: row_id out of bound";
     split_fea_->Copy(row_id, feas);
     split_value_->Copy(row_id, values);
     weight[row_id] = w;

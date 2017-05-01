@@ -15,11 +15,11 @@ using namespace std;
 
 EnsembleMessageTreePtr Master(int round, int comm_sz, MPI_Datatype &MPI_TREE);
 
-void Worker(int round, int myrank, MPI_Datatype &MPI_TREE);
+void Worker(int round, int myrank, MPI_Datatype &MPI_TREE, int thread, int sample);
 
 void BunddleMaster(int round, int comm_sz, MPI_Datatype &MPI_TREE);
-void BunddleWorker(int round, int myrank, MPI_Datatype &MPI_TREE);
-DLLEXPORT int Dabtree(int round,bool bunddle=true);
+void BunddleWorker(int round, int myrank, MPI_Datatype &MPI_TREE, int thread, int sample);
+DLLEXPORT int Dabtree(int round,bool bunddle=true,int thread=1, int sample=50000);
 
 
 #endif

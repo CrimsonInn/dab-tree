@@ -3,7 +3,6 @@
 #include <iostream>
 #include <memory>
 #include <vector>
-#include <glog/logging.h>
 #include <mutex>
 
 enum FeaType {
