@@ -7,28 +7,33 @@ Team: Qin Lyu, Bingfeng Xia, MingLong Wu, Hengte Lin
 <p>GBDT has been applied to wide varities of applications including physics [4], computer vision [5], and web-search ranking [6, 7]. To cope with increased scale of datasets, a distributed and parallel version of GBDT will be implemented in this project. The scaling property of the implemented system will be tested based on a real world application.</p>
 
 ## What is a Tree
-<img src="/ReadMeImages/tree.png" width="100">
+<img src="/ReadMeImages/tree.png" width="200">
 
 Tree the a kind of prediction model based on thresholds.
+Here is an example:
+<img src="/ReadMeImages/tree2.png" width="200">
 
 ## What is a Gradient Boosting Tree
+First One need to know what is Ensamble. Ensamble is a technology to group some models and make them vote for the final result.
+<img src="/ReadMeImages/ensamble.png" width="200">
 
 ## Goal
 A distributed asynchronous stochastic gradient boosting system will be implemented and be tested on a HPC cluster. In addition, parallel computing will be used to accelerate training models on each node.
 
-## Data Division
-Data can be first divided into packs and saved as google protobuf files.
+## Design
+Data can be first divided into packs and saved as google protobuf files. Then protobuf files are read by trainers in batches. Trainers will iteratively grow nodes on a tree until reach limit. Then trainer will read next data batch and train the next tree.
+<img src="/ReadMeImages/Design.png" width="200">
 
 ## Pipeline of training one tree
-
+<img src="/ReadMeImages/train_one_tree.png" width="200">
 ## Local Training Process
-
+<img src="/ReadMeImages/pipeline.png" width="200">
 ## MPI Method
 The algorithm can operate on an OpenMPI cluster. The cluster was designed to have one Master and several Workers. Workers are the nodes that actually read data and create trees, while Master act as a trading center to asynchronously exchange trees among Workers.
 
 ### Batch Delivery Mode
 To reduce the communication overhead while trading trees with Master, DABTREE supports the option to deliever trees in batches. Delivering trees in batches will significantly reduce the cost of communication, with the cost of reducing accuracy.
-
+<img src="/ReadMeImages/batchMPI.png" width="200">
 ## Performance
 Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with an existing Gradient Boosting Tree library.
 
