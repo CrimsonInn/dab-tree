@@ -6,14 +6,35 @@ Team: Qin Lyu, Bingfeng Xia, MingLong Wu, Hengte Lin
 <p>Gradient boosting decision tree (GBDT) is a machine learning technique that can be used for regression and classification problem [1]. GBDT was proposed by Jerome H. Friedman [2,3] that constructs additive model using decision tree as a weak learner. Advantages of GBDT include its capability to model feature interaction and to perform inherent feature selection.</p>
 <p>GBDT has been applied to wide varities of applications including physics [4], computer vision [5], and web-search ranking [6, 7]. To cope with increased scale of datasets, a distributed and parallel version of GBDT will be implemented in this project. The scaling property of the implemented system will be tested based on a real world application.</p>
 
+## What is a Tree
+
+## What is a Gradient Boosting Tree
+
 ## Goal
 A distributed asynchronous stochastic gradient boosting system will be implemented and be tested on a HPC cluster. In addition, parallel computing will be used to accelerate training models on each node.
+
+## Data Division
+Data can be first divided into packs and saved as google protobuf files.
+
+## Pipeline of training one tree
+
+## Local Training Process
+
+## MPI Method
+The algorithm can operate on an OpenMPI cluster. The cluster was designed to have one Master and several Workers. Workers are the nodes that actually read data and create trees, while Master act as a trading center to asynchronously exchange trees among Workers.
+
+### Batch Delivery Mode
+To reduce the communication overhead while trading trees with Master, DABTREE supports the option to deliever trees in batches. Delivering trees in batches will significantly reduce the cost of communication, with the cost of reducing accuracy.
 
 ## Performance
 Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with an existing Gradient Boosting Tree library.
 
+## Instruction
+Pull the repo in Master branch. cd into "/build" folder. run "cmake.sh". cd back to root folder. type "mpirun -n #numnodes ./cluster --thread=#threadPerWorker --batch=#samplingSize --bundle=#(true/false)batchFunctionality " 
+
 ## Preliminary results
 A Gradient boosting decision tree algorithm is implemented with C++ using serial computation approach. A preiliminary version of parallel algorithm using MPI is also implemented. Initial tests are performed by comparing training time to existing software packages including GBoost in sklearn and XGBoost. Computation time is listed below. All algorithms achieve similar accuracies.
+
 #### Training size (88896, 17)
 1. GBoost (sklearn)   31.33 sec
 2. XGBoost            14.72 sec
