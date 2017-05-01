@@ -7,6 +7,9 @@ Team: Qin Lyu, Bingfeng Xia, MingLong Wu, Hengte Lin
 <p>GBDT has been applied to wide varities of applications including physics [4], computer vision [5], and web-search ranking [6, 7]. To cope with increased scale of datasets, a distributed and parallel version of GBDT will be implemented in this project. The scaling property of the implemented system will be tested based on a real world application.</p>
 
 ## What is a Tree
+![Alt text](/ReadMeImages/tree.png)
+
+Tree the a kind of prediction model based on thresholds.
 
 ## What is a Gradient Boosting Tree
 
