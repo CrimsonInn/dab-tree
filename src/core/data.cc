@@ -8,30 +8,10 @@
 
 DataProvider::DataProvider(const std::string &file_name, size_t tn) {
 
-  // Verify that the version of the protobuf that we linked against is
-  // compatible with the version of the headers we compiled against.
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-  row_index = 0;
-  validation_size = 1000;
-  LOG(INFO) << "Init DataProvider ..." ;
-  LOG(INFO) << "Begin read protobuf file " << file_name << " ..." ;
-  rawdata::Matrix read_batch_data;
+  // MPI test load_data
 
-  THREADS_NUM = tn;
-  // Read the existing address book.
-  std::fstream input(file_name, std::ios::in | std::ios::binary);
-  if (!input) {
-    LOG(INFO) << file_name << ": File not found. Creating a new file.";
-  } else if (!read_batch_data.ParseFromIstream(&input)) {
-    LOG(ERROR) << "Failed to parse protobuf file.";
-    return ;
-  }
-
-  unsigned int width = read_batch_data.width();
-  unsigned int height = read_batch_data.height();
-
-  // std::cout << width << std::endl;
-  // std::cout << height << std::endl;
+  unsigned int width = 17;
+  unsigned int height = 20000;
 
   indexes_.resize(height - validation_size);
   for (size_t i = 0; i < height - validation_size; ++i) {
@@ -40,47 +20,110 @@ DataProvider::DataProvider(const std::string &file_name, size_t tn) {
 
   std::vector<FeaType> ft;
   for (size_t i = 0; i < width; ++i) {
-    ft.push_back(FeaType(read_batch_data.fea_types(i)));
+    ft.push_back(FeaType(1));
   }
   sample_ptr_->SetType(ft);
 
-  // std::vector<std::thread> threads;
-  // for (size_t tid = 0; tid < THREADS_NUM; ++tid){
-    // threads.push_back(std::thread([&, this, tid](){
-      // for (size_t i = tid; i < height; i += THREADS_NUM) {
-      for (size_t i = 0; i < height; ++i) {
-
-        // if (i % THREADS_NUM != tid) continue;
-
-        // std::vector<Value> sample = std::vector<Value>(width);
-        std::vector<Value> sample;
-        // size_t index = indexes_[i];
-        for (size_t j = 0; j < width; ++j) {
-          if (ft[j] == CONT){
-            sample.push_back({.v = read_batch_data.data(i * width + j).v()});
-            // sample[j].v = read_batch_data.data(i * width + j).v();
-          } else if (ft[j] == DISC) {
-            sample.push_back({.cls = read_batch_data.data(i * width + j).cls()});
-            // sample[j].cls = read_batch_data.data(i * width + j).cls();
-          } else if (ft[j] == RANK) {
-            sample.push_back({.level = static_cast<int>(read_batch_data.data(i * width + j).level())});
-            // sample[j].level = static_cast<int>(read_batch_data.data(i * width + j).level());
-          } else {
-            LOG(ERROR) << "Protobuf data type error.";
-            return ;
-          }
-        }
-        sample_ptr_->Add(sample);
+  for (size_t i = 0; i < height; ++i) {
+    std::vector<Value> sample;
+    // size_t index = indexes_[i];
+    for (size_t j = 0; j < width; ++j) {
+      if (ft[j] == CONT){
+        sample.push_back({.v = 1.});
+        // sample[j].v = read_batch_data.data(i * width + j).v();
+      } else if (ft[j] == DISC) {
+        sample.push_back({.cls = 2.});
+        // sample[j].cls = read_batch_data.data(i * width + j).cls();
+      } else if (ft[j] == RANK) {
+        sample.push_back({.level = 3.});
+        // sample[j].level = static_cast<int>(read_batch_data.data(i * width + j).level());
+      } else {
+        LOG(ERROR) << "Protobuf data type error.";
+        return ;
       }
+    }
+    sample_ptr_->Add(sample);
+  }
 
-  //     }));
-  // }
-  // std::for_each(threads.begin(), threads.end(), mem_fn(&std::thread::join));
 
   sample_ptr_->set_width(width);
   sample_ptr_->set_height(height);
 
-  LOG(INFO) << "Succeed!" ;
+
+
+  // // Verify that the version of the protobuf that we linked against is
+  // // compatible with the version of the headers we compiled against.
+  // GOOGLE_PROTOBUF_VERIFY_VERSION;
+  // row_index = 0;
+  // validation_size = 1000;
+  // LOG(INFO) << "Init DataProvider ..." ;
+  // LOG(INFO) << "Begin read protobuf file " << file_name << " ..." ;
+  // rawdata::Matrix read_batch_data;
+
+  // THREADS_NUM = tn;
+  // // Read the existing address book.
+  // std::fstream input(file_name, std::ios::in | std::ios::binary);
+  // if (!input) {
+  //   LOG(INFO) << file_name << ": File not found. Creating a new file.";
+  // } else if (!read_batch_data.ParseFromIstream(&input)) {
+  //   LOG(ERROR) << "Failed to parse protobuf file.";
+  //   return ;
+  // }
+
+  // unsigned int width = read_batch_data.width();
+  // unsigned int height = read_batch_data.height();
+
+  // // std::cout << width << std::endl;
+  // // std::cout << height << std::endl;
+
+  // indexes_.resize(height - validation_size);
+  // for (size_t i = 0; i < height - validation_size; ++i) {
+  //   indexes_[i] = i + validation_size;
+  // }
+
+  // std::vector<FeaType> ft;
+  // for (size_t i = 0; i < width; ++i) {
+  //   ft.push_back(FeaType(read_batch_data.fea_types(i)));
+  // }
+  // sample_ptr_->SetType(ft);
+
+  // // std::vector<std::thread> threads;
+  // // for (size_t tid = 0; tid < THREADS_NUM; ++tid){
+  //   // threads.push_back(std::thread([&, this, tid](){
+  //     // for (size_t i = tid; i < height; i += THREADS_NUM) {
+  //     for (size_t i = 0; i < height; ++i) {
+
+  //       // if (i % THREADS_NUM != tid) continue;
+
+  //       // std::vector<Value> sample = std::vector<Value>(width);
+  //       std::vector<Value> sample;
+  //       // size_t index = indexes_[i];
+  //       for (size_t j = 0; j < width; ++j) {
+  //         if (ft[j] == CONT){
+  //           sample.push_back({.v = read_batch_data.data(i * width + j).v()});
+  //           // sample[j].v = read_batch_data.data(i * width + j).v();
+  //         } else if (ft[j] == DISC) {
+  //           sample.push_back({.cls = read_batch_data.data(i * width + j).cls()});
+  //           // sample[j].cls = read_batch_data.data(i * width + j).cls();
+  //         } else if (ft[j] == RANK) {
+  //           sample.push_back({.level = static_cast<int>(read_batch_data.data(i * width + j).level())});
+  //           // sample[j].level = static_cast<int>(read_batch_data.data(i * width + j).level());
+  //         } else {
+  //           LOG(ERROR) << "Protobuf data type error.";
+  //           return ;
+  //         }
+  //       }
+  //       sample_ptr_->Add(sample);
+  //     }
+
+  // //     }));
+  // // }
+  // // std::for_each(threads.begin(), threads.end(), mem_fn(&std::thread::join));
+
+  // sample_ptr_->set_width(width);
+  // sample_ptr_->set_height(height);
+
+  // LOG(INFO) << "Succeed!" ;
 }
 
 
