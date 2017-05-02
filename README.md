@@ -53,10 +53,15 @@ To reduce the communication overhead while trading trees with Master, DABTREE su
 Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with an existing Gradient Boosting Tree library.
 
 ## Instruction
+
 Pull the repo in master branch. 
+
 cd into "/build" folder. 
+
 run "cmake.sh". 
+
 cd back to root folder. 
+
 type "mpirun -n #numnodes ./cluster --round=#numTreePerNode --threads=#threadPerWorker --batch=#samplingSize --bundle=#(true/false)batchFunctionality " 
 
 PS: If you used batch delivery functionality, numTreePerNode must be multiple of 10.
