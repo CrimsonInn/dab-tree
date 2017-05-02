@@ -1,7 +1,7 @@
 #include "matrix.h"
 #include "data.h"
 #include "tree.h"
-#include "proto_func.h"
+
 #include <iostream>
 #include <string>
 #include <cmath>

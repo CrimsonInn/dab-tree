@@ -7,6 +7,7 @@
 #include <climits>
 #include <sstream>
 #include <string>
+#include <cstring>
 
 
 
