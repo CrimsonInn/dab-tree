@@ -53,7 +53,13 @@ To reduce the communication overhead while trading trees with Master, DABTREE su
 Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with an existing Gradient Boosting Tree library.
 
 ## Instruction
-Pull the repo in Master branch. cd into "/build" folder. run "cmake.sh". cd back to root folder. type "mpirun -n #numnodes ./cluster --thread=#threadPerWorker --batch=#samplingSize --bundle=#(true/false)batchFunctionality " 
+Pull the repo in master branch. 
+cd into "/build" folder. 
+run "cmake.sh". 
+cd back to root folder. 
+type "mpirun -n #numnodes ./cluster --round=#numTreePerNode --threads=#threadPerWorker --batch=#samplingSize --bundle=#(true/false)batchFunctionality " 
+
+PS: If you used batch delivery functionality, numTreePerNode must be multiple of 10.
 
 ## Preliminary results
 A Gradient boosting decision tree algorithm is implemented with C++ using serial computation approach. A preiliminary version of parallel algorithm using MPI is also implemented. Initial tests are performed by comparing training time to existing software packages including GBoost in sklearn and XGBoost. Computation time is listed below. All algorithms achieve similar accuracies.
