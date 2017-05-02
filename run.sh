@@ -10,5 +10,5 @@
 #cmake -DUSE_MPI=ON
 #make
 mpicxx -std=c++11 -I include/ src/cluster/cluster.cc src/core/*.cc src/trainer/trainer.cc
-mpirun -n 3 ./cluster 50 2 50000
+mpirun -n 3 ./cluster 50 true 2 50000
 #srun -n 3 --mpi=pmi2 ./dabtree 10
