@@ -49,8 +49,8 @@ To reduce the communication overhead while trading trees with Master, DABTREE su
 
 <img src="/ReadMeImages/batchMPI.png" width="600">
 
-## Performance
-Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy can be compared with an existing Gradient Boosting Tree library.
+## Implementation
+A Gradient boosting decision tree algorithm is implemented with C++ using serial computation approach. A parallel algorithm using MPI and c++ threading is also implemented. Initial tests are performed by comparing training time to existing software packages including GBoost in sklearn and XGBoost. Computation time is listed below. All algorithms achieve similar accuracies.
 
 ## Instruction
 
@@ -66,8 +66,8 @@ type "mpirun -n #numnodes ./cluster --round=#numTreePerNode --threads=#threadPer
 
 PS: If you used batch delivery functionality, numTreePerNode must be multiple of 10.
 
-## Preliminary results
-A Gradient boosting decision tree algorithm is implemented with C++ using serial computation approach. A preiliminary version of parallel algorithm using MPI is also implemented. Initial tests are performed by comparing training time to existing software packages including GBoost in sklearn and XGBoost. Computation time is listed below. All algorithms achieve similar accuracies.
+## Performance
+Scalability and efficiency of algorithm will be tested. Training speed and prediction accuracy are comparable with an existing Gradient Boosting Tree library.
 
 #### Training size (88896, 17)
 
@@ -76,6 +76,11 @@ A Gradient boosting decision tree algorithm is implemented with C++ using serial
 <img src="/ReadMeImages/efficiency.jpg" width="600">
 
 <img src="/ReadMeImages/AWS.png" width="600">
+
+## Discussion
+
+The algorithm is faster than sklearn even using single thread, and achieves multiple times of speedup with multi-threading. We plan to continue developing the repo and make it an open source project. The target is to achieve better speed and accuracy than all existing packages.
+
 
 ## Reference
 1. Wikipedia, https://en.wikipedia.org/wiki/Gradient_boosting
