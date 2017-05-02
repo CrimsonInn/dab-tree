@@ -12,13 +12,14 @@ Team: Qin Lyu, Bingfeng Xia, MingLong Wu, Hengte Lin
 
 <img src="/ReadMeImages/tree.png" width="200">
 
-Tree the a kind of prediction model based on thresholds.
+Tree the a kind of prediction model based on thresholds. According to WikiPedia, "A decision tree is a decision support tool that uses a tree-like graph or model of decisions and their possible consequences, including chance event outcomes, resource costs, and utility. It is one way to display an algorithm."
+
 Here is an example:
 
 <img src="/ReadMeImages/tree2.png" width="600">
 
 ## What is a Gradient Boosting Tree
-First One need to know what is Ensamble. Ensamble is a technology to group some models and make them vote for the final result.
+First One need to know what is Ensamble. Ensamble is a technology to group some models and make them vote for the final result. There are two main kinds of ensamble, bagging and boosting. In bagging, models are indipendent of each other. In Gradient Boosting, models interatively learn what's left from the previous model.
 
 <img src="/ReadMeImages/ensamble.png" width="600">
 
@@ -35,6 +36,8 @@ Data can be first divided into packs and saved as google protobuf files. Then pr
 <img src="/ReadMeImages/train_one_tree.png" width="600">
 
 ## Local Training Process
+
+Both data preparation and tree node growing are parallelized using c++ threading.
 
 <img src="/ReadMeImages/pipeline.png" width="600">
 
