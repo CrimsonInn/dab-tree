@@ -16,7 +16,7 @@ Tree the a kind of prediction model based on thresholds. According to WikiPedia,
 
 Here is an example:
 
-<img src="/ReadMeImages/tree2.png" width="600">
+<img src="/ReadMeImages/tree2.png" width="400">
 
 ## What is a Gradient Boosting Tree
 First One need to know what is Ensamble. Ensamble is a technology to group some models and make them vote for the final result. There are two main kinds of ensamble, bagging and boosting. In bagging, models are indipendent of each other. In Gradient Boosting, models interatively learn what's left from the previous model.
@@ -59,10 +59,12 @@ Pull the repo in Master branch. cd into "/build" folder. run "cmake.sh". cd back
 A Gradient boosting decision tree algorithm is implemented with C++ using serial computation approach. A preiliminary version of parallel algorithm using MPI is also implemented. Initial tests are performed by comparing training time to existing software packages including GBoost in sklearn and XGBoost. Computation time is listed below. All algorithms achieve similar accuracies.
 
 #### Training size (88896, 17)
-1. GBoost (sklearn)   31.33 sec
-2. XGBoost            14.72 sec
-3. DabTree(MPI)       7.21 sec
 
+<img src="/ReadMeImages/single.jpg" width="600">
+
+<img src="/ReadMeImages/efficiency.jpg" width="600">
+
+<img src="/ReadMeImages/AWS.png" width="600">
 
 ## Reference
 1. Wikipedia, https://en.wikipedia.org/wiki/Gradient_boosting
